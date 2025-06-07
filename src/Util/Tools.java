@@ -1,15 +1,26 @@
+/*
+ * Copyright 2025 Carlos Polo Zamora - CPZ - CePeZeta
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package Util;
 
-// <editor-fold defaultstate="collapsed" desc="*** import ***">
 import Util.Constantes.ColorComponente;
 import java.util.HashMap;
 import java.util.Map;
 import processing.core.PApplet;
-// </editor-fold>
 
-/**
- * @author CPZ
- */
 public class Tools {
 
     public static String getFecha() {
