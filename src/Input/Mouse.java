@@ -27,18 +27,14 @@ import processing.core.PApplet;
 
 import java.math.BigDecimal;
 
-import static Util.Constantes.MATH_CONTEXT;
-
 public class Mouse implements MouseInput {
 
     @Override
     public boolean mouseWheel(int d, Object... o) {
         if (o != null
-                && o.length == 2
-                && o[0] instanceof Barra bar
-                && o[1] instanceof PerlinVector perlin) {
+                && o.length == 1
+                && o[0] instanceof Barra bar) {
             bar.setValorPorMouse(d);
-            updatePerlinBar(bar, perlin);
             return true;
         }
         return false;
@@ -52,47 +48,10 @@ public class Mouse implements MouseInput {
     @Override
     public boolean mouseReleased(int mouseButton, Object... o) {
         if (o != null
-                && o.length == 3
+                && o.length == 1
                 && o[0] instanceof Switch sw
-                && o[1] instanceof Barra bar
-                && o[2] instanceof PerlinVector perlin
                 && mouseButton == PApplet.LEFT) {
             sw.conmutarEstado();
-            bar.setValor(sw.isOn() ? bar.getValorMax().multiply(new BigDecimal("0.5")) : BigDecimal.ZERO);
-            updatePerlinBar(bar, perlin);
-            return true;
-        }
-        if (o != null
-                && o.length == 2
-                && o[0] instanceof Barra bar
-                && o[1] instanceof PerlinVector perlin
-                && mouseButton == PApplet.RIGHT) {
-            bar.setValor(bar.getValor().compareTo(BigDecimal.ZERO) > 0 ? BigDecimal.ZERO : bar.getValorMax());
-            updatePerlinBar(bar, perlin);
-            return true;
-        }
-        if (o != null
-                && o.length == 2
-                && o[0] instanceof Barra bar
-                && o[1] instanceof PerlinVector perlin
-                && mouseButton == PApplet.CENTER) {
-            float tercio = bar.getValorMax().divide(new BigDecimal(3), MATH_CONTEXT).floatValue();
-            float valor = bar.getValor().floatValue();
-            if (valor == 1) {
-                valor = 0;
-                bar.setValor(new BigDecimal(valor));
-                updatePerlinBar(bar, perlin);
-                return true;
-            }
-            if (valor < tercio) {
-                valor = tercio;
-            } else if (valor >= tercio && valor < tercio * 2) {
-                valor = tercio * 2;
-            } else if (valor >= tercio * 2) {
-                valor = 1;
-            }
-            bar.setValor(new BigDecimal(valor));
-            updatePerlinBar(bar, perlin);
             return true;
         }
         return false;
@@ -101,12 +60,10 @@ public class Mouse implements MouseInput {
     @Override
     public boolean mouseDragged(int mouseButton, Object... o) {
         if (o != null
-                && o.length == 2
+                && o.length == 1
                 && o[0] instanceof Barra bar
-                && o[1] instanceof PerlinVector perlin
                 && mouseButton == PApplet.LEFT) {
             mouseDraggedLeftBarra(bar);
-            updatePerlinBar(bar, perlin);
             return true;
         }
         return false;

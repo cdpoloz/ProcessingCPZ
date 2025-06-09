@@ -120,7 +120,7 @@ public class Label implements ElementoUI, Identificable {
     }
 
     public List<PVector> getLstEsquinas() {
-        List lstEsquinas = new ArrayList<>();
+        List<PVector> lstEsquinas = new ArrayList<>();
         Map<Esquina, PVector> esquinas = getEsquinas();
         lstEsquinas.add(esquinas.get(Esquina.SUP_IZQ));
         lstEsquinas.add(esquinas.get(Esquina.SUP_DER));

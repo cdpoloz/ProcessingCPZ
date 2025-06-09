@@ -18,6 +18,7 @@ package UI;
 
 import Interfaces.ElementoUI;
 import Interfaces.Identificable;
+import Main.Sketch;
 import Util.Constantes.Esquina;
 import Util.Tools;
 import processing.core.PApplet;
@@ -32,7 +33,7 @@ import java.util.Map;
 public class Switch implements ElementoUI, Identificable {
 
     private final PVector pos;
-    private PApplet sk;
+    private Sketch sketch;
     private int id;
     private String codigo, estadoApp, rutaShape;
     private float ancho, alto, x, y;
@@ -45,13 +46,13 @@ public class Switch implements ElementoUI, Identificable {
         pos = new PVector();
     }
 
-    public Switch(PApplet sk) {
-        this.sk = sk;
+    public Switch(Sketch sk) {
+        this.sketch = sk;
         pos = new PVector();
     }
 
     public Switch(Switch sw) {
-        sk = sw.sk;
+        sketch = sw.sketch;
         pos = new PVector(sw.pos.x, sw.pos.y);
         ancho = sw.ancho;
         alto = sw.alto;
@@ -86,13 +87,13 @@ public class Switch implements ElementoUI, Identificable {
         if (!display) {
             return;
         }
-        sk.noStroke();
-        sk.fill(c);
-        sk.shape(shape, pos.x, pos.y, ancho, alto);
+        sketch.noStroke();
+        sketch.fill(c);
+        sketch.shape(shape, pos.x, pos.y, ancho, alto);
         if (showHover && editable) {
             // se grafica el efecto hover
-            sk.fill(cHover);
-            sk.shape(shape, pos.x, pos.y, ancho, alto);
+            sketch.fill(cHover);
+            sketch.shape(shape, pos.x, pos.y, ancho, alto);
         }
     }
 
@@ -118,7 +119,7 @@ public class Switch implements ElementoUI, Identificable {
         if (!display || !editable) {
             return;
         }
-        cHover = sk.color(sk.red(cHover), sk.green(cHover), sk.blue(cHover), isHovering() ? 64 : 0);
+        cHover = sketch.color(sketch.red(cHover), sketch.green(cHover), sketch.blue(cHover), isHovering() ? 64 : 0);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class Switch implements ElementoUI, Identificable {
         if (!display || !editable) {
             return false;
         }
-        return Tools.isHovering(sk.mouseX, sk.mouseY, pos.x, pos.y, ancho, alto);
+        return Tools.isHovering(sketch.mouseX, sketch.mouseY, pos.x, pos.y, ancho, alto);
     }
 
     @Override
@@ -198,8 +199,8 @@ public class Switch implements ElementoUI, Identificable {
         this.y = y;
     }
 
-    public void setSk(PApplet sk) {
-        this.sk = sk;
+    public void setSketch(Sketch sketch) {
+        this.sketch = sketch;
     }
 
     public String getEstadoApp() {

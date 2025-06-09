@@ -25,3 +25,9 @@ replay_pid*
 /.idea
 *.iml
 /out
+/build/
+/dist/
+/src/META-INF
+*.mf
+*.mf
+manifest.mf

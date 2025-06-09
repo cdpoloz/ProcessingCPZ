@@ -16,13 +16,14 @@
 
 package Bean;
 
+import Main.Sketch;
 import processing.core.PApplet;
 
 import static java.lang.Math.random;
 
 public class Perlin {
 
-    private PApplet sketch;
+    private Sketch sketch;
     private float valor;
     private float velocidad;
 
@@ -43,7 +44,7 @@ public class Perlin {
     }
 
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
-    public void setSketch(PApplet sketch) {
+    public void setSketch(Sketch sketch) {
         this.sketch = sketch;
     }
 

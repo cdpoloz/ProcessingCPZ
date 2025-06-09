@@ -14,26 +14,16 @@
  * limitations under the License.
  */
 
-package Input;
+package Main;
 
-import Interfaces.TecladoInput;
-import UI.Switch;
+import java.util.Locale;
+import processing.core.PApplet;
 
-import static Util.Constantes.BARRA_ESPACIADORA;
+public class Launcher extends PApplet {
 
-public class Teclado implements TecladoInput {
-
-    @Override
-    public boolean keyReleased(char key, int keyCode, Object... o) {
-        if (keyCode == BARRA_ESPACIADORA) {
-            ((Switch) o[0]).conmutarEstado();
-            return true;
-        }
-        return false;
+    public static void main(String[] args) {
+        Locale.setDefault(Locale.forLanguageTag("en-US"));
+        PApplet.main(new String[]{"Main.Sketch"});
     }
 
-    @Override
-    public boolean keyPressed(char key, int keyCode, Object... o) {
-        return false;
-    }
 }

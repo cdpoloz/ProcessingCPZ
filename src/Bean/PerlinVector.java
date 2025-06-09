@@ -16,6 +16,7 @@
 
 package Bean;
 
+import Main.Sketch;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -61,7 +62,7 @@ public class PerlinVector {
         z.setVelocidad(vel);
     }
 
-    public void setSketch(PApplet sketch) {
+    public void setSketch(Sketch sketch) {
         x.setSketch(sketch);
         y.setSketch(sketch);
         z.setSketch(sketch);
