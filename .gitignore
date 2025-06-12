@@ -27,7 +27,5 @@ replay_pid*
 /out
 /build/
 /dist/
-/src/META-INF
-*.mf
-*.mf
-manifest.mf
+/jar
+/jar
