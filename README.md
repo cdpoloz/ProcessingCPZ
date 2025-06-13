@@ -2,15 +2,13 @@
 
 ## Elementos interactivos simples para el control de una interfaz gráfica de usuario.
 
-##
-
 Con el pasar de los años he tratado de sacarle el máximo provecho a [Processing](https://processing.org/) para crear
 interfaces gráficas interactivas implementando controles personalizados y animaciones. Si bien el IDE de Processing
 muestra mejoras constantes con cada nueva versión, decidí preparar esta plantilla de proyecto Java para que pueda ser
 utilizado en otros entornos habiéndolo ya probado en IntelliJ CE y Apache Netbeans. Esto con el fin de aprovechar al
 máximo las herramientas de cada uno de estos así como del lenguaje Java mismo. Ya era hora de compartir lo aprendido.
 
-## Estructura del proyecto
+## 📂 Estructura del proyecto
 
 - **src/**: Código fuente Java organizado en paquetes:
     - com.cpz.processing.Bean
@@ -34,12 +32,12 @@ máximo las herramientas de cada uno de estos así como del lenguaje Java mismo.
 
 - **META-INF/MANIFEST.MF**: Archivo manifest indicando la clase principal para ejecución (`com.cpz.processing.Main.Launcher`).
 
-## Requisitos y dependencias
+## ⚙️ Requisitos y dependencias
 
 - Java 17 o superior (compatible con versiones anteriores)
 - Librería Processing para Java (versión usada en el proyecto incluida como dependencia)
 
-## Compilar el proyecto
+## 🛠️ Compilar el proyecto
 
 1. Clona el repositorio:
 
@@ -92,24 +90,41 @@ Si prefieres ejecutarlo manualmente, asegúrate de incluir este argumento:
 java --enable-native-access=ALL-UNNAMED -jar cpzProcessing.jar
 ```
 
-## 📚 Uso
+## 🎨 Uso
 
 En la clase Launcher se debe elegir el sketch que se desee ejecutar, puedes elegir uno del paquete 'Ejemplos' o crear
 uno propio. Por defecto se ejecuta el ejemplo 'SimpleUI', espero poder agregar más ejemplos en un futuro no muy lejano.
 
-## 📄 Licencia
+## 📜 Licencia
 
 Este proyecto está licenciado bajo la Apache License 2.0. Consulta el archivo LICENSE para más detalles.
 
-## 📬 Contacto
+## ✉️ Contacto
 
 Para dudas, sugerencias o reportes de error, por favor abre un issue en este repositorio o contacta a:
 
 **[cdpoloz](https://github.com/cdpoloz)** (autor)
 
-## 📦 Releases
+## 🚀 Releases
 
 Para obtener el archivo .jar compilado para usar como librería externa, revisa la sección de Releases o contacta al
 autor si aún no está disponible.
+
+## 📦 Usar como librería externa
+
+El archivo cpzProcessing.jar también puede importarse en otros proyectos Java para utilizar sus clases y métodos. Puedes agregarlo como dependencia en tu entorno de desarrollo favorito (por ejemplo, IntelliJ IDEA, NetBeans o Eclipse).
+
+Ejemplo (compilación manual):
+
+```bash
+javac -cp cpzProcessing.jar MiClase.java
+```
+
+Ejemplo (ejecución manual):
+
+```bash
+java --enable-native-access=ALL-UNNAMED -cp cpzProcessing.jar:. MiClase
+```
+
 
 ¡Gracias por interesarte en este proyecto!
