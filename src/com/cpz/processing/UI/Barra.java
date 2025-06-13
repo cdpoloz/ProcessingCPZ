@@ -18,6 +18,7 @@ package com.cpz.processing.UI;
 
 import com.cpz.processing.Interfaces.Editable;
 import com.cpz.processing.Interfaces.UI.ElementoUI;
+import com.cpz.processing.Interfaces.UI.Hoverable;
 import com.cpz.processing.Interfaces.Identificable;
 import com.cpz.processing.Util.Constantes.BarraModo;
 import com.cpz.processing.Util.Constantes.Orientacion;
@@ -35,7 +36,7 @@ import java.util.Map;
 
 import static com.cpz.processing.Util.Constantes.MATH_CONTEXT;
 
-public class Barra implements ElementoUI, Identificable, Editable {
+public class Barra implements ElementoUI, Identificable, Editable, Hoverable {
 
     private PApplet sketch;
     private int id;

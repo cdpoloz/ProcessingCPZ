@@ -14,14 +14,37 @@
  * limitations under the License.
  */
 
-package com.cpz.processing.Ejemplos;
+/*
+ * cpzProcessing - SimpleUI
+ *
+ * Ejemplo de una interfaz gráfica con elementos interactivos simples.
+ *
+ * Este sketch muestra el uso de etiquetas, barras y switches personalizados,
+ * temporizadores, ruido Perlin para generar movimiento fluido para el punto
+ * animado y control de eventos de entrada usando el teclado y ratón.
+ *
+ * Tanto los objetos de tipo Barra o Switch podrían usar archivos de imágenes
+ * personalizados en vez de los archivos incluidos por defecto. Se recomienda
+ * el uso de archivos de tipo 'Plain SVG' aunque también se pueden usar archivos
+ * SVG exportados de Inkscape, Adobe Illustrator u otros. La apariencia visual
+ * de los controles es completamente personalizable mediante el reemplazo de estos
+ * archivos.
+ *
+ * Se incluye el paquete 'Input' en el que se encuentran las implementaciones
+ * de las interfaces InputMouse e InputTeclado. Cada ejemplo tiene su propio
+ * paquete 'Input' porque las implementaciones de los eventos de teclado y
+ * ratón pueden variar dependiendo del sketch de ejemplo.
+ */
+
+package com.cpz.processing.Ejemplos.SimpleUI;
 
 import com.cpz.processing.Bean.PerlinVector;
 import com.cpz.processing.Bean.Timer;
+import com.cpz.processing.Ejemplos.SimpleUI.Input.Mouse;
+import com.cpz.processing.Ejemplos.SimpleUI.Input.Teclado;
 import com.cpz.processing.UI.Barra;
 import com.cpz.processing.UI.Label;
 import com.cpz.processing.UI.Switch;
-import com.cpz.processing.Util.Calc;
 import processing.core.PApplet;
 import processing.core.PVector;
 import processing.event.MouseEvent;
@@ -38,6 +61,8 @@ public class SimpleUI extends PApplet {
     private Switch sw, swInd;
     private Timer timerSwInd;
     private PerlinVector perlin;
+    private Mouse mouse;
+    private Teclado teclado;
 
     @Override
     public void settings() {
@@ -50,6 +75,8 @@ public class SimpleUI extends PApplet {
         surface.setTitle("ProcessingCPZ - Ejemplos");
         frameRate(60);
 
+        mouse = new Mouse();
+        teclado = new Teclado();
         lblTitulo1 = new Label();
         lblTitulo1.setSketch(this);
         lblTitulo1.setPos(50, 50);
@@ -84,7 +111,7 @@ public class SimpleUI extends PApplet {
         bar.setOrientacion(Orientacion.VERTICAL);
         bar.setModo(BarraModo.INTERACTIVO);
         bar.setShape(loadShape("data" + File.separator + "img" + File.separator + "cuadrado.svg"));
-        bar.setPos(100, 125);
+        bar.setPos(100, 100);
 
         lblBar = new Label();
         lblBar.setSketch(this);
@@ -164,7 +191,7 @@ public class SimpleUI extends PApplet {
         BigDecimal valorBar = bar.getValor();
         StringBuilder sb = new StringBuilder();
         sb.append(String.format("%.0f%%", valorBar.multiply(CIEN, MATH_CONTEXT))).append("\n\n");
-        sb.append("Con esta barra\n").append("puedes usar\n").append("mouseWheel()\no\nmouseDragged()");
+        sb.append("Con esta barra\n").append("puedes usar\n").append("mouseWheel(),\nmouseDragged()\no\nmouseReleased()\n(botón derecho)");
         lblBar.setTexto(sb);
         lblSw.setTexto("Este es un\nswitch simple\nque puedes\nconmutar con\nmouseReleased()\no la barra\nespaciadora\n\n" + (sw.isOn() ? "On" : "Off"));
         float velocidadPunto = map(valorBar.floatValue(), bar.getValorMin().floatValue(), bar.getValorMax().floatValue(), 0.0035f, 0.02f);
@@ -191,47 +218,23 @@ public class SimpleUI extends PApplet {
 
     @Override
     public void mouseReleased() {
-        if (mouseButton == PApplet.LEFT && sw.isHovering()) {
-            sw.conmutarEstado();
-        }
+        mouse.mouseReleased(mouseButton, sw);
+        mouse.mouseReleased(mouseButton, bar);
     }
 
     @Override
     public void mouseWheel(MouseEvent event) {
-        if (bar.isHovering()) {
-            bar.setValorPorMouse(event.getCount());
-        }
+        mouse.mouseWheel(event.getCount(), bar);
     }
 
     @Override
     public void mouseDragged() {
-        if (mouseButton == PApplet.LEFT && bar.isHovering()) {
-            mouseDraggedLeftBarra(bar);
-        }
-    }
-
-    private void mouseDraggedLeftBarra(Barra bar) {
-        BigDecimal posMin, posMax;
-        BigDecimal valorMin = bar.getValorMin();
-        BigDecimal valorMax = bar.getValorMax();
-        BigDecimal valor;
-        if (bar.getOrientacion() == Orientacion.HORIZONTAL) {
-            posMin = new BigDecimal(bar.getEsquina(Esquina.SUP_IZQ).x);
-            posMax = new BigDecimal(bar.getEsquina(Esquina.SUP_DER).x);
-            valor = Calc.map(new BigDecimal(bar.getSketch().mouseX), posMin, posMax, valorMin, valorMax);
-        } else {
-            posMax = new BigDecimal(bar.getEsquina(Esquina.SUP_IZQ).y);
-            posMin = new BigDecimal(bar.getEsquina(Esquina.INF_IZQ).y);
-            valor = Calc.map(new BigDecimal(bar.getSketch().mouseY), posMin, posMax, valorMin, valorMax);
-        }
-        bar.setValor(valor);
+        mouse.mouseDragged(mouseButton, bar);
     }
 
     @Override
     public void keyReleased() {
-        if (keyCode == BARRA_ESPACIADORA) {
-            sw.conmutarEstado();
-        }
+        teclado.keyReleased(key, keyCode, sw);
     }
 
 }

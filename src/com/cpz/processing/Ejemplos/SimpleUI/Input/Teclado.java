@@ -14,34 +14,28 @@
  * limitations under the License.
  */
 
-package com.cpz.processing.Input;
+package com.cpz.processing.Ejemplos.SimpleUI.Input;
 
-import com.cpz.processing.Interfaces.Input.InputMouse;
+import com.cpz.processing.Interfaces.Input.InputTeclado;
+import com.cpz.processing.UI.Switch;
 
-public class Mouse implements InputMouse {
+import static com.cpz.processing.Util.Constantes.BARRA_ESPACIADORA;
+
+public class Teclado implements InputTeclado {
 
     @Override
-    public boolean mouseWheel(int d, Object... o) {
+    public boolean keyReleased(char key, int keyCode, Object... o) {
+        if (keyCode == BARRA_ESPACIADORA
+                && o != null
+                && o.length == 1
+                && o[0] instanceof Switch sw) {
+            sw.conmutarEstado();
+        }
         return false;
     }
 
     @Override
-    public boolean mouseClicked(int mouseButton, Object... o) {
-                return false;
-    }
-
-    @Override
-    public boolean mouseReleased(int mouseButton, Object... o) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseDragged(int mouseButton, Object... o) {
-        return false;
-    }
-
-    @Override
-    public boolean mouseMoved() {
+    public boolean keyPressed(char key, int keyCode, Object... o) {
         return false;
     }
 }

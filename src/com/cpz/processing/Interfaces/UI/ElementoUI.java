@@ -26,8 +26,6 @@ public interface ElementoUI {
     
     void setDisplay(boolean display);
 
-    boolean isHovering();
-
     boolean isFlancoSubida();
 
     boolean isFlancoBajada();

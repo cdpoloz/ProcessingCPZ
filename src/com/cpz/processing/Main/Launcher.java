@@ -24,7 +24,7 @@ public class Launcher extends PApplet {
 
     public static void main(String[] args) {
         Locale.setDefault(Locale.forLanguageTag("en-US"));
-        String sketchParaEjecutar = "com.cpz.processing.Ejemplos.SimpleUI";
+        String sketchParaEjecutar = "com.cpz.processing.Ejemplos.SimpleUI.SimpleUI";
         PApplet.main(new String[]{sketchParaEjecutar});
         //PApplet.main(new String[]{"--present", sketchParaEjecutar}); // ejecución en pantalla completa
     }

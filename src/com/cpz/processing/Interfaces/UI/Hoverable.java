@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.cpz.processing.Interfaces;
+package com.cpz.processing.Interfaces.UI;
 
 public interface Hoverable {
     
-    boolean isHovering(String s);
-    
+    boolean isHovering();
+
 }

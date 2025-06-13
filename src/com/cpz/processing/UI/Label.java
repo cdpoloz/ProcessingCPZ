@@ -19,6 +19,7 @@ package com.cpz.processing.UI;
 import com.cpz.processing.Interfaces.Editable;
 import com.cpz.processing.Interfaces.UI.ElementoUI;
 import com.cpz.processing.Interfaces.Identificable;
+import com.cpz.processing.Interfaces.UI.Hoverable;
 import com.cpz.processing.Util.Constantes.AlineaX;
 import com.cpz.processing.Util.Constantes.AlineaY;
 import com.cpz.processing.Util.Constantes.Esquina;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Label implements ElementoUI, Identificable, Editable {
+public class Label implements ElementoUI, Identificable, Editable, Hoverable {
 
     private final PVector pos;
     private PApplet sketch;
