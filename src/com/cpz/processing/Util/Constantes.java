@@ -22,22 +22,22 @@ import java.math.RoundingMode;
 
 public class Constantes {
 
-    public static enum BarraModo {
+    public enum BarraModo {
         INTERACTIVO, INDICADOR
     };
-    public static enum Orientacion {
+    public enum Orientacion {
         HORIZONTAL, VERTICAL
     };
-    public static enum AlineaX {
+    public enum AlineaX {
         IZQ, CENTRO, DER
     };
-    public static enum AlineaY {
+    public enum AlineaY {
         SUP, CENTRO, INF
     };
-    public static enum Esquina {
+    public enum Esquina {
         SUP_IZQ, SUP_DER, INF_IZQ, INF_DER
     };
-    public static enum ColorComponente {
+    public enum ColorComponente {
         RED, GREEN, BLUE, ALPHA
     };
     public static final MathContext MATH_CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
