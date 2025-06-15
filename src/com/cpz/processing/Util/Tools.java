@@ -17,11 +17,13 @@
 package com.cpz.processing.Util;
 
 import com.cpz.processing.Util.Constantes.ColorComponente;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import processing.core.PApplet;
+import processing.core.PVector;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Tools {
 
@@ -87,5 +89,23 @@ public class Tools {
         int g = (int) (g1 + (g2 - g1) * t);
         int b = (int) (b1 + (b2 - b1) * t);
         return (a << 24) | (r << 16) | (g << 8) | b;
+    }
+
+
+    public static List<PVector> calcularNuevaTrayectoria(PVector posIni, PVector posFin, int pasos) {
+        List<PVector> lstPos = new ArrayList<>();
+        for (int i = 0; i < pasos; i++) {
+            float f = PApplet.map(i, 0, pasos, 0, 1);
+            PVector v = PVector.lerp(posIni, posFin, f);
+            lstPos.add(v);
+        }
+        return lstPos;
+    }
+
+    public static PVector calcularNormal(PVector posIni, PVector posFin) {
+        PVector dir = PVector.sub(posFin, posIni);
+        PVector normal = new PVector(-dir.y, dir.x);
+        normal.normalize();
+        return normal;
     }
 }
