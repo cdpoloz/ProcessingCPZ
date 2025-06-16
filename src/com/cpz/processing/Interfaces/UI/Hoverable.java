@@ -18,6 +18,6 @@ package com.cpz.processing.Interfaces.UI;
 
 public interface Hoverable {
     
-    boolean isHovering();
+    boolean isHovering(Object... o);
 
 }

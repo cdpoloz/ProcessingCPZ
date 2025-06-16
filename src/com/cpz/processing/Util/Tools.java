@@ -20,6 +20,10 @@ import com.cpz.processing.Util.Constantes.ColorComponente;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,4 +112,15 @@ public class Tools {
         normal.normalize();
         return normal;
     }
+
+    public static List<String> leerArchivo(String ruta) {
+        try {
+            Path path = Paths.get(ruta);
+            return Files.readAllLines(path);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return List.of();
+        }
+    }
+
 }

@@ -91,7 +91,7 @@ public class Barra implements ElementoUI, Identificable, Editable, Hoverable {
     }
 
     @Override
-    public boolean isHovering() {
+    public boolean isHovering(Object... o) {
         if (!display || !editable) {
             return false;
         }
