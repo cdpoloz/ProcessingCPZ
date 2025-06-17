@@ -37,7 +37,7 @@ public class Label implements ElementoUI, Identificable, Editable, Hoverable {
     private PApplet sketch;
     private int id;
     private float tamTexto;
-    private String texto, codigo, estado, estadoApp;
+    private String texto, codigo;
     private int c, alineaX, alineaY;
     private boolean display;
     private int anchoVentana, altoVentana;
@@ -179,24 +179,8 @@ public class Label implements ElementoUI, Identificable, Editable, Hoverable {
         this.id = id;
     }
 
-    public String getEstadoApp() {
-        return estadoApp;
-    }
-
-    public void setEstadoApp(String estadoApp) {
-        this.estadoApp = estadoApp;
-    }
-
     public void setSketch(PApplet sketch) {
         this.sketch = sketch;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
     }
 
     public void setAlineaX(AlineaX x) {

@@ -57,6 +57,14 @@ public class Tools {
         return bx && by;
     }
 
+    public static int construirColor(String s) {
+        int r = Integer.parseInt(s.split(":")[0]);
+        int g = Integer.parseInt(s.split(":")[1]);
+        int b = Integer.parseInt(s.split(":")[2]);
+        int a = Integer.parseInt(s.split(":")[3]);
+        return construirColor(r, g, b, a);
+    }
+
     public static int construirColor(float red, float green, float blue, float alpha) {
         return ((int) alpha << 24) | ((int) red << 16) | ((int) green << 8) | (int) blue;
     }

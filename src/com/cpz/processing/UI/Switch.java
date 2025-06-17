@@ -36,7 +36,7 @@ public class Switch implements ElementoUI, Identificable, Editable, Hoverable {
     private final PVector pos;
     private PApplet sketch;
     private int id;
-    private String codigo, estadoApp, rutaShape;
+    private String codigo, rutaShape;
     private float ancho, alto, x, y;
     private int c, cOn, cHover, cOff;
     private PShape shape;
@@ -202,14 +202,6 @@ public class Switch implements ElementoUI, Identificable, Editable, Hoverable {
 
     public void setSketch(PApplet sketch) {
         this.sketch = sketch;
-    }
-
-    public String getEstadoApp() {
-        return estadoApp;
-    }
-
-    public void setEstadoApp(String estadoApp) {
-        this.estadoApp = estadoApp;
     }
 
     public boolean isDisplay() {
