@@ -111,7 +111,7 @@ public class Fluido {
     public void draw() {
         lstMovil.forEach(Movil::draw);
     }
-    
+
     public void updateVelocidad(String modoCambioVelocidad) {
         if (modoCambioVelocidad.equals("+")) {
             velocidadNoise += dVelocidadNoise;
@@ -121,7 +121,7 @@ public class Fluido {
         velocidadNoise = constrain(velocidadNoise, velocidadNoiseMin, velocidadNoiseMax);
         lstMovil.forEach(m -> m.setVelocidadNoise(velocidadNoise));
     }
-    
+
     public int getCantidadMoviles() {
         return lstMovil.size();
     }
@@ -179,9 +179,9 @@ public class Fluido {
                 timer.iniciar(10);
             }
             case "vaciarLista" ->
-                modo = "llenarLista";
+                    modo = "llenarLista";
             case "llenarLista" ->
-                modo = "vaciarLista";
+                    modo = "vaciarLista";
         }
     }
 

@@ -84,7 +84,7 @@ public class FluidoSimple extends PApplet {
         fluido.setRangoAlfa(0.2f, 1f);
         fluido.setRangoVelocidadNoise(0.015f, 0.040f, 0.001f);
         fluido.setCantidadMovilesMax(cantidadMoviles);
-        lstPos.stream().forEach(p -> fluido.addPos(p, normal));
+        lstPos.forEach(p -> fluido.addPos(p, normal));
 
     }
 
