@@ -31,111 +31,112 @@ import static processing.core.PApplet.constrain;
 public class Fluido {
 
     private final PApplet sketch;
-    private final List<Movil> lstMovil;
-    private final Timer timer;
-    private String modo;
     private PImage img;
-    private int colorRelleno, periodo, cantidadMovilesMax;
+    private int cantidadMovilesMax;
+    private final List<Movil> lstMoviles;
+    private String modo;
+    private float velNoiseMin, velNoiseMax, dVelNoise, velNoise;
+    private float diametroMin, diametroMax, diametro;
+    private float desviacionMax;
     private float alfaMin, alfaMax;
-    private float velocidadNoise, velocidadNoiseMin, velocidadNoiseMax, dVelocidadNoise;
-    private float desviacionMax, diametroMin, diametroMax;
-    private final List<PVector> lstPos, lstNormal;
+    private int periodo;
+    private int dIndPosMin, dIndPosMax;
+    private float alfaFondoMin, alfaFondoMax, alfaFondo;
+    private int colorRelleno, colorOn, colorOff, colorFondo;
+    private boolean running;
+    private List<PVector> posiciones, normales;
 
     public Fluido(PApplet sketch) {
         this.sketch = sketch;
-        lstMovil = new ArrayList<>();
-        lstPos = new ArrayList<>();
-        lstNormal = new ArrayList<>();
-        timer = new Timer();
-        timer.setSketch(sketch);
+        lstMoviles = new ArrayList<>();
         modo = "listaVacia";
     }
 
     public void update() {
-        updateContenidoLista();
-        lstMovil.forEach(Movil::update);
-    }
-
-    private void updateContenidoLista() {
-        if (!timer.isRunning()) {
-            return;
-        }
-        if (modo.equals("llenarLista")) {
-            llenarLista();
-        } else if (modo.equals("vaciarLista")) {
-            vaciarLista();
-        }
-    }
-
-    private void llenarLista() {
-        if (!timer.periodoPulso()) {
-            return;
-        }
-        if (lstMovil.size() == cantidadMovilesMax) {
-            timer.stop();
-            modo = "listaLlena";
-            return;
-        }
-        PVector normal = lstNormal.get(lstMovil.size());
-        Movil movil = new Movil(sketch);
-        movil.setColorRelleno(colorRelleno);
-        movil.setDesviacionMax(desviacionMax);
-        movil.setImg(img);
-        movil.setLstPos(lstPos);
-        movil.setNormal(normal);
-        movil.setPeriodo(periodo);
-        movil.setRangoAlfa(alfaMin, alfaMax);
-        movil.setVelocidadNoise(velocidadNoise);
-        movil.setDiametro(sketch.random(diametroMin, diametroMax));
-        movil.setup();
-        lstMovil.add(movil);
-    }
-
-    private void vaciarLista() {
-        if (!timer.periodoPulso()) {
-            return;
-        }
-        if (lstMovil.isEmpty()) {
-            timer.stop();
-            modo = "listaVacia";
-            return;
-        }
-        for (int i = lstMovil.size() - 1; i >= 0; i--) {
-            if (!lstMovil.get(i).isFinRecorrido()) {
-                continue;
-            }
-            lstMovil.remove(i);
-        }
+        updateCantidadMoviles();
+        updateColorFondo();
+        lstMoviles.forEach(Movil::update);
     }
 
     public void draw() {
-        lstMovil.forEach(Movil::draw);
+        lstMoviles.forEach(Movil::draw);
     }
 
-    public void updateVelocidad(String modoCambioVelocidad) {
-        if (modoCambioVelocidad.equals("+")) {
-            velocidadNoise += dVelocidadNoise;
-        } else {
-            velocidadNoise -= dVelocidadNoise;
+    private void updateCantidadMoviles() {
+        if (modo.equals("llenarLista") && lstMoviles.size() < cantidadMovilesMax) llenarLista();
+        else if (modo.equals("llenarLista") && lstMoviles.size() == cantidadMovilesMax) modo = "listaLlena";
+        else if (modo.equals("vaciarLista")) {
+            if (!lstMoviles.isEmpty()) vaciarLista();
+            else modo = "listaVacia";
         }
-        velocidadNoise = constrain(velocidadNoise, velocidadNoiseMin, velocidadNoiseMax);
-        lstMovil.forEach(m -> m.setVelocidadNoise(velocidadNoise));
+        running = !lstMoviles.isEmpty();
     }
 
-    public int getCantidadMoviles() {
-        return lstMovil.size();
+    private void updateColorFondo() {
+        if (!running) {
+            colorFondo = colorOff;
+            return;
+        }
+        alfaFondo = (int) PApplet.map(lstMoviles.size(), 0, cantidadMovilesMax, alfaFondoMax, alfaFondoMin);
+        float f = PApplet.map(alfaFondo, alfaFondoMax, alfaFondoMin, 0, 1);
+        colorOn = sketch.color(sketch.red(colorOn), sketch.green(colorOn), sketch.blue(colorOn), alfaFondo);
+        colorOff = sketch.color(sketch.red(colorOff), sketch.green(colorOff), sketch.blue(colorOff), alfaFondo);
+        colorFondo = sketch.lerpColor(colorOff, colorOn, f);
     }
 
-    public void setRangoDiametro(float diametroMin, float diametroMax) {
-        this.diametroMin = diametroMin;
-        this.diametroMax = diametroMax;
+    private void llenarLista() {
+        Movil m = new Movil(sketch);
+        m.setImg(img);
+        m.setDiametro(sketch.random(diametroMin, diametroMax));
+        m.setColorRelleno(colorOn);
+        m.setDesviacionMax(desviacionMax);
+        m.setPeriodo(periodo);
+        m.setRangoAlfa(alfaMin, alfaMax);
+        m.setVelocidadNoise(velNoise);
+        m.setDeltaIndPos((int) sketch.random(dIndPosMin, dIndPosMax));
+        m.setLstPos(posiciones);
+        m.setLstNormal(normales);
+        m.setup();
+        lstMoviles.add(m);
     }
 
-    public void setColorRelleno(int colorRelleno) {
-        this.colorRelleno = colorRelleno;
+    private void vaciarLista() {
+        for (int i = lstMoviles.size() - 1; i >= 0; i--) {
+            if (!lstMoviles.get(i).isFinRecorrido()) {
+                continue;
+            }
+            lstMoviles.remove(i);
+        }
     }
 
-    public void setDesviacionMaxima(float desviacionMax) {
+    public void actualizarVelocidadNoisePorDiferencial(String modo) {
+        float d = modo.equals("+") ? dVelNoise : -dVelNoise;
+        velNoise += d;
+        velNoise = constrain(velNoise, velNoiseMin, velNoiseMax);
+        lstMoviles.forEach(m -> m.setVelocidadNoise(velNoise));
+    }
+
+    public void setVelocidadNoise(float f) {
+        velNoise = PApplet.map(f, 0, 1, velNoiseMin, velNoiseMax);
+        velNoise = constrain(velNoise, velNoiseMin, velNoiseMax);
+        lstMoviles.forEach(m -> m.setVelocidadNoise(velNoise));
+    }
+
+    public void conmutarEstadoFluido() {
+        if (modo.equals("listaVacia") || modo.equals("vaciarLista")) modo = "llenarLista";
+        else if (modo.equals("listaLlena") || modo.equals("llenarLista")) modo = "vaciarLista";
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
+    public void setImg(PImage img) {
+        this.img = img;
+    }
+
+    public void setCantidadMovilesMax(int cantidadMovilesMax) {
+        this.cantidadMovilesMax = cantidadMovilesMax;
+    }
+
+    public void setDesviacionMax(float desviacionMax) {
         this.desviacionMax = desviacionMax;
     }
 
@@ -143,53 +144,50 @@ public class Fluido {
         this.periodo = periodo;
     }
 
-    public void setRangoAlfa(float alfaMin, float alfaMax) {
+    public void setNormales(List<PVector> normales) {
+        this.normales = normales;
+    }
+
+    public void setPosiciones(List<PVector> posiciones) {
+        this.posiciones = posiciones;
+    }
+
+    public void setRangoVelocidadNoise(float velNoiseMin, float velNoiseMax, float dVelNoise) {
+        this.velNoiseMin = velNoiseMin;
+        this.velNoiseMax = velNoiseMax;
+        this.dVelNoise = dVelNoise;
+        this.velNoise = velNoiseMin;
+    }
+
+    public void setRangoDiametro(float diametroMin, float diametroMax) {
+        this.diametroMin = diametroMin;
+        this.diametroMax = diametroMax;
+    }
+
+    public void setRangoAlfaMovil(float alfaMin, float alfaMax) {
         this.alfaMin = alfaMin;
         this.alfaMax = alfaMax;
     }
 
-    public void setRangoVelocidadNoise(float velocidadNoiseMin, float velocidadNoiseMax, float dVelocidadNoise) {
-        this.velocidadNoiseMin = velocidadNoiseMin;
-        this.velocidadNoiseMax = velocidadNoiseMax;
-        this.dVelocidadNoise = dVelocidadNoise;
-        velocidadNoise = velocidadNoiseMin;
+    public void setRangoAlfaFondo(float alfaFondoMin, float alfaFondoMax) {
+        this.alfaFondoMin = alfaFondoMin * 255;
+        this.alfaFondoMax = alfaFondoMax * 255;
+        alfaFondo = alfaFondoMax;
     }
 
-    public void setCantidadMovilesMax(int cantidadMovilesMax) {
-        this.cantidadMovilesMax = cantidadMovilesMax;
+    public void setRangDeltaIndPos(int dIndPosMin, int dIndPosMax) {
+        this.dIndPosMin = dIndPosMin;
+        this.dIndPosMax = dIndPosMax;
     }
 
-    public int getCantidadMovilesMax() {
-        return cantidadMovilesMax;
+    public void setRangoColores(int colorOff, int colorOn) {
+        this.colorOff = colorOff;
+        this.colorOn = colorOn;
+        colorFondo = colorOff;
     }
 
-    public void addPos(PVector pos, PVector normal) {
-        lstPos.add(pos);
-        lstNormal.add(normal);
+    public int getColorFondo() {
+        return colorFondo;
     }
-
-    public void updateModo() {
-        switch(modo) {
-            case "listaLlena" -> {
-                modo = "vaciarLista";
-                timer.iniciar(10);
-            }
-            case "listaVacia" -> {
-                modo = "llenarLista";
-                timer.iniciar(10);
-            }
-            case "vaciarLista" ->
-                    modo = "llenarLista";
-            case "llenarLista" ->
-                    modo = "vaciarLista";
-        }
-    }
-
-    public void setImg(PImage img) {
-        this.img = img;
-    }
-
-    public boolean isRunning() {
-        return !lstMovil.isEmpty();
-    }
+// </editor-fold>
 }

@@ -103,17 +103,6 @@ public class Tools {
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
 
-
-    public static List<PVector> calcularNuevaTrayectoria(PVector posIni, PVector posFin, int pasos) {
-        List<PVector> lstPos = new ArrayList<>();
-        for (int i = 0; i < pasos; i++) {
-            float f = PApplet.map(i, 0, pasos, 0, 1);
-            PVector v = PVector.lerp(posIni, posFin, f);
-            lstPos.add(v);
-        }
-        return lstPos;
-    }
-
     public static PVector calcularNormal(PVector posIni, PVector posFin) {
         PVector dir = PVector.sub(posFin, posIni);
         PVector normal = new PVector(-dir.y, dir.x);

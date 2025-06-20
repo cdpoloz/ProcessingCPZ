@@ -16,6 +16,7 @@
 
 package com.cpz.processing.Bean;
 
+import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static processing.core.PApplet.map;
 import static processing.core.PConstants.CENTER;
+import static processing.core.PConstants.CORNER;
 
 /**
  * @author CPZ
@@ -33,12 +35,17 @@ public class Movil {
 
     private final PApplet sketch;
     private final PVector pos;
-    private PVector normal;
     private PImage img;
     private int colorRelleno, indPos, periodo;
-    private float alfa, alfaMin, alfaMax, off, dOff, desviacionMax, diametro;
+    private float alfaMin;
+    private float alfaMax;
+    private float offset;
+    private float dOffset;
+    private float desviacionMax;
+    private float diametro;
     private final Timer timer;
     private List<PVector> lstPos, lstNormal;
+    private float deltaIndPos;
     private boolean finRecorrido;
 
     public Movil(PApplet sketch) {
@@ -50,7 +57,7 @@ public class Movil {
 
     public void setup() {
         timer.iniciar(periodo);
-        off = sketch.random(5000);
+        offset = sketch.random(5000);
         reiniciarCondiciones();
     }
 
@@ -58,18 +65,19 @@ public class Movil {
         if (!timer.periodoPulso()) {
             return;
         }
-        indPos += 1;
+        indPos += (int) deltaIndPos;
         finRecorrido = indPos >= lstPos.size();
         if (finRecorrido) {
             reiniciarCondiciones();
             return;
         }
         PVector v = lstPos.get(indPos);
-        float d = sketch.noise(off);
+        PVector normal = lstNormal.get(indPos);
+        float d = sketch.noise(offset);
         d = map(d, 0, 1, -desviacionMax, desviacionMax);
         PVector vDesv = new PVector(normal.x * d, normal.y * d);
         pos.set((v.x + vDesv.x) * sketch.width, (v.y + vDesv.y) * sketch.height);
-        off += dOff;
+        offset += dOffset;
     }
 
     public void draw() {
@@ -77,11 +85,12 @@ public class Movil {
         sketch.tint(colorRelleno);
         sketch.image(img, pos.x, pos.y, diametro, diametro);
         sketch.tint(255, 255);
+        sketch.imageMode(CORNER);
     }
 
     private void reiniciarCondiciones() {
         indPos = 0;
-        alfa = sketch.random(alfaMin, alfaMax) * 255;
+        float alfa = sketch.random(alfaMin, alfaMax) * 255;
         colorRelleno = sketch.color(sketch.red(colorRelleno), sketch.green(colorRelleno), sketch.blue(colorRelleno), alfa);
     }
 
@@ -94,9 +103,13 @@ public class Movil {
         this.img = img;
     }
 
-    public void setLstPos(List<PVector> lstPos) {
+    public void setLstPos(@NotNull List<PVector> lstPos) {
         this.lstPos = lstPos;
         pos.set(lstPos.getFirst().x, lstPos.getFirst().y);
+    }
+
+    public void setLstNormal(@NotNull List<PVector> lstNormal) {
+        this.lstNormal = lstNormal;
     }
 
     public void addPos(PVector pos, PVector normal) {
@@ -111,15 +124,11 @@ public class Movil {
     }
 
     public void setVelocidadNoise(float dOff) {
-        this.dOff = dOff;
+        this.dOffset = dOff;
     }
 
     public void setDesviacionMax(float desviacionMax) {
         this.desviacionMax = desviacionMax;
-    }
-
-    public void setNormal(PVector normal) {
-        this.normal = normal;
     }
 
     public void setRangoAlfa(float alfaMin, float alfaMax) {
@@ -129,6 +138,10 @@ public class Movil {
 
     public void setPeriodo(int periodo) {
         this.periodo = periodo;
+        if (timer.isRunning()) {
+            timer.stop();
+            timer.iniciar(periodo);
+        }
     }
 
     public boolean isFinRecorrido() {
@@ -138,5 +151,9 @@ public class Movil {
     public void setDiametro(float diametro) {
         this.diametro = diametro * sketch.height;
     }
-    // </editor-fold>
+
+    public void setDeltaIndPos(float deltaIndPos) {
+        this.deltaIndPos = deltaIndPos;
+    }
+// </editor-fold>
 }
