@@ -33,10 +33,10 @@ import static processing.core.PApplet.constrain;
 public class Fluido {
 
     private final PApplet sketch;
+    private final List<Movil> lstMoviles;
     private PImage img;
     private int cantidadMovilesMax;
-    private final List<Movil> lstMoviles;
-    private FluidoEstado modo;
+    private FluidoEstado estado;
     private float velNoiseMin, velNoiseMax, dVelNoise, velNoise;
     private float diametroMin, diametroMax, diametro;
     private float desviacionMax;
@@ -45,15 +45,25 @@ public class Fluido {
     private int dIndPosMin, dIndPosMax;
     private int colorOn;
     private List<PVector> posiciones, normales;
-    private boolean running;
+    private boolean running, finRecorridoPrimero, finRecorridoUltimo;
+    private Fluido fluidoPrevio;
 
     public Fluido(PApplet sketch) {
         this.sketch = sketch;
         lstMoviles = new ArrayList<>();
-        modo = VACIO;
+        estado = VACIO;
     }
 
     public void update() {
+        if (fluidoPrevio != null) {
+            if (fluidoPrevio.isRunning()
+                    && fluidoPrevio.isFinRecorridoPrimero()
+                    && (estado == FluidoEstado.VACIO || estado == FluidoEstado.VACIAR)) {
+                estado = FluidoEstado.LLENAR;
+            } else if (fluidoPrevio.getEstado() == FluidoEstado.VACIO && running) {
+                estado = FluidoEstado.VACIAR;
+            }
+        }
         updateCantidadMoviles();
         lstMoviles.forEach(Movil::update);
     }
@@ -63,11 +73,15 @@ public class Fluido {
     }
 
     private void updateCantidadMoviles() {
-        if (modo == LLENAR && lstMoviles.size() < cantidadMovilesMax) llenarLista();
-        else if (modo == LLENAR && lstMoviles.size() == cantidadMovilesMax) modo = LLENO;
-        else if (modo == VACIAR) {
+        if (estado == LLENAR && lstMoviles.size() < cantidadMovilesMax) llenarLista();
+        else if (estado == LLENAR && lstMoviles.size() == cantidadMovilesMax) estado = LLENO;
+        else if (estado == VACIAR) {
             if (!lstMoviles.isEmpty()) vaciarLista();
-            else modo = VACIO;
+            else {
+                estado = VACIO;
+                finRecorridoPrimero = false;
+                finRecorridoUltimo = false;
+            }
         }
         running = !lstMoviles.isEmpty();
     }
@@ -115,8 +129,29 @@ public class Fluido {
     }
 
     public void conmutarEstadoFluido() {
-        if (modo == VACIO || modo == VACIAR) modo = LLENAR;
-        else if (modo == LLENO || modo == LLENAR) modo = VACIAR;
+        if (estado == VACIO || estado == VACIAR) estado = LLENAR;
+        else if (estado == LLENO || estado == LLENAR) estado = VACIAR;
+    }
+
+    public boolean isFinRecorridoPrimero() {
+        if (lstMoviles.isEmpty()) {
+            finRecorridoPrimero = false;
+            return finRecorridoPrimero;
+        }
+        if (!finRecorridoPrimero) {
+            finRecorridoPrimero = lstMoviles.getFirst().isFinRecorrido();
+        }
+        return finRecorridoPrimero;
+    }
+
+    public boolean isFinRecorridoUltimo() {
+        if (lstMoviles.isEmpty()) {
+            return true;
+        }
+        if (!finRecorridoUltimo) {
+            finRecorridoUltimo = estado == VACIAR &&  lstMoviles.getLast().isFinRecorrido();
+        }
+        return finRecorridoUltimo;
     }
 
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
@@ -173,6 +208,18 @@ public class Fluido {
 
     public boolean isRunning() {
         return running;
+    }
+
+    public FluidoEstado getEstado() {
+        return estado;
+    }
+
+    public void setEstado(FluidoEstado estado) {
+        this.estado = estado;
+    }
+
+    public void setFluidoPrevio(Fluido fluidoPrevio) {
+        this.fluidoPrevio = fluidoPrevio;
     }
 // </editor-fold>
 }
