@@ -17,6 +17,8 @@
 package com.cpz.processing.Util;
 
 import com.cpz.processing.Util.Constantes.ColorComponente;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -31,24 +33,22 @@ import java.util.Map;
 
 public class Tools {
 
+    @NotNull
     public static String getFecha() {
-        String s
-                = String.format("%02d", PApplet.day())
+        return String.format("%02d", PApplet.day())
                 + "/"
                 + String.format("%02d", PApplet.month())
                 + "/"
                 + String.format("%02d", PApplet.year());
-        return s;
     }
 
+    @NotNull
     public static String getHora() {
-        String s
-                = String.format("%02d", PApplet.hour())
+        return String.format("%02d", PApplet.hour())
                 + ":"
                 + String.format("%02d", PApplet.minute())
                 + ":"
                 + String.format("%02d", PApplet.second());
-        return s;
     }
 
     public static boolean isHovering(float mouseX, float mouseY, float x, float y, float w, float h) {
@@ -58,10 +58,11 @@ public class Tools {
     }
 
     public static int construirColor(String s) {
-        int r = Integer.parseInt(s.split(":")[0]);
-        int g = Integer.parseInt(s.split(":")[1]);
-        int b = Integer.parseInt(s.split(":")[2]);
-        int a = Integer.parseInt(s.split(":")[3]);
+        String[] componentes = s.split(":");
+        int r = Integer.parseInt(componentes[0]);
+        int g = Integer.parseInt(componentes[1]);
+        int b = Integer.parseInt(componentes[2]);
+        int a = Integer.parseInt(componentes[3]);
         return construirColor(r, g, b, a);
     }
 
@@ -77,6 +78,7 @@ public class Tools {
         return construirColor(gray, gray, gray, alpha);
     }
 
+    @NotNull
     public static Map<ColorComponente, Integer> deconstruirColor(int c) {
         Map<ColorComponente, Integer> componentes = new HashMap<>();
         componentes.put(ColorComponente.RED, (c >> 16) & 0xFF);
@@ -104,6 +106,9 @@ public class Tools {
     }
 
     public static PVector calcularNormal(PVector posIni, PVector posFin) {
+        if (posIni == null || posFin == null) {
+            return null;
+        }
         PVector dir = PVector.sub(posFin, posIni);
         PVector normal = new PVector(-dir.y, dir.x);
         normal.normalize();
@@ -120,4 +125,13 @@ public class Tools {
         }
     }
 
+    @NotNull
+    public static List<PVector> calcularPosicionesEnRecta(PVector pIni, PVector pFin, int pasos) {
+        List<PVector> lstPos = new ArrayList<>();
+        for (int i = 0; i < pasos; i++) {
+            PVector pos = PVector.lerp(pIni, pFin, (float) i / pasos);
+            lstPos.add(new PVector(pos.x, pos.y));
+        }
+        return lstPos;
+    }
 }

@@ -16,6 +16,7 @@
 
 package com.cpz.processing.Bean;
 
+import com.cpz.processing.Util.Constantes.FluidoEstado;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
@@ -23,6 +24,7 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.cpz.processing.Util.Constantes.FluidoEstado.*;
 import static processing.core.PApplet.constrain;
 
 /**
@@ -34,27 +36,25 @@ public class Fluido {
     private PImage img;
     private int cantidadMovilesMax;
     private final List<Movil> lstMoviles;
-    private String modo;
+    private FluidoEstado modo;
     private float velNoiseMin, velNoiseMax, dVelNoise, velNoise;
     private float diametroMin, diametroMax, diametro;
     private float desviacionMax;
     private float alfaMin, alfaMax;
     private int periodo;
     private int dIndPosMin, dIndPosMax;
-    private float alfaFondoMin, alfaFondoMax, alfaFondo;
-    private int colorRelleno, colorOn, colorOff, colorFondo;
-    private boolean running;
+    private int colorOn;
     private List<PVector> posiciones, normales;
+    private boolean running;
 
     public Fluido(PApplet sketch) {
         this.sketch = sketch;
         lstMoviles = new ArrayList<>();
-        modo = "listaVacia";
+        modo = VACIO;
     }
 
     public void update() {
         updateCantidadMoviles();
-        updateColorFondo();
         lstMoviles.forEach(Movil::update);
     }
 
@@ -63,25 +63,17 @@ public class Fluido {
     }
 
     private void updateCantidadMoviles() {
-        if (modo.equals("llenarLista") && lstMoviles.size() < cantidadMovilesMax) llenarLista();
-        else if (modo.equals("llenarLista") && lstMoviles.size() == cantidadMovilesMax) modo = "listaLlena";
-        else if (modo.equals("vaciarLista")) {
+        if (modo == LLENAR && lstMoviles.size() < cantidadMovilesMax) llenarLista();
+        else if (modo == LLENAR && lstMoviles.size() == cantidadMovilesMax) modo = LLENO;
+        else if (modo == VACIAR) {
             if (!lstMoviles.isEmpty()) vaciarLista();
-            else modo = "listaVacia";
+            else modo = VACIO;
         }
         running = !lstMoviles.isEmpty();
     }
 
-    private void updateColorFondo() {
-        if (!running) {
-            colorFondo = colorOff;
-            return;
-        }
-        alfaFondo = (int) PApplet.map(lstMoviles.size(), 0, cantidadMovilesMax, alfaFondoMax, alfaFondoMin);
-        float f = PApplet.map(alfaFondo, alfaFondoMax, alfaFondoMin, 0, 1);
-        colorOn = sketch.color(sketch.red(colorOn), sketch.green(colorOn), sketch.blue(colorOn), alfaFondo);
-        colorOff = sketch.color(sketch.red(colorOff), sketch.green(colorOff), sketch.blue(colorOff), alfaFondo);
-        colorFondo = sketch.lerpColor(colorOff, colorOn, f);
+    public float getFactorLlenado() {
+        return (float) lstMoviles.size() / cantidadMovilesMax;
     }
 
     private void llenarLista() {
@@ -123,8 +115,8 @@ public class Fluido {
     }
 
     public void conmutarEstadoFluido() {
-        if (modo.equals("listaVacia") || modo.equals("vaciarLista")) modo = "llenarLista";
-        else if (modo.equals("listaLlena") || modo.equals("llenarLista")) modo = "vaciarLista";
+        if (modo == VACIO || modo == VACIAR) modo = LLENAR;
+        else if (modo == LLENO || modo == LLENAR) modo = VACIAR;
     }
 
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
@@ -169,25 +161,18 @@ public class Fluido {
         this.alfaMax = alfaMax;
     }
 
-    public void setRangoAlfaFondo(float alfaFondoMin, float alfaFondoMax) {
-        this.alfaFondoMin = alfaFondoMin * 255;
-        this.alfaFondoMax = alfaFondoMax * 255;
-        alfaFondo = alfaFondoMax;
-    }
-
     public void setRangDeltaIndPos(int dIndPosMin, int dIndPosMax) {
         this.dIndPosMin = dIndPosMin;
         this.dIndPosMax = dIndPosMax;
     }
 
-    public void setRangoColores(int colorOff, int colorOn) {
-        this.colorOff = colorOff;
+    public void setColorOn(int colorOn) {
         this.colorOn = colorOn;
-        colorFondo = colorOff;
+        lstMoviles.forEach(m -> m.setColorRelleno(colorOn));
     }
 
-    public int getColorFondo() {
-        return colorFondo;
+    public boolean isRunning() {
+        return running;
     }
 // </editor-fold>
 }

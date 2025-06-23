@@ -257,6 +257,10 @@ public class Switch implements ElementoUI, Identificable, Editable, Hoverable {
         this.cOn = cOn;
     }
 
+    public int getColorOn() {
+        return cOn;
+    }
+
     public void setColorHover(int cHover) {
         this.cHover = cHover;
     }
@@ -286,6 +290,9 @@ public class Switch implements ElementoUI, Identificable, Editable, Hoverable {
         this.editable = editable;
     }
 
-    // </editor-fold>
+    public PApplet getSketch() {
+        return sketch;
+    }
+// </editor-fold>
 
 }
