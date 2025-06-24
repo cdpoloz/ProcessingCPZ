@@ -16,7 +16,6 @@
 
 package com.cpz.processing.Bean;
 
-import com.cpz.processing.Util.Constantes.FluidoEstado;
 import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -25,7 +24,6 @@ import processing.core.PVector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.cpz.processing.Util.Constantes.FluidoEstado.*;
 import static processing.core.PApplet.constrain;
 
 /**
@@ -33,11 +31,11 @@ import static processing.core.PApplet.constrain;
  */
 public class Fluido {
 
-    private PApplet sketch;
     private final List<Movil> lstMoviles;
+    private final List<Fluido> fluidosOrigen;
+    private PApplet sketch;
     private PImage img;
     private int cantidadMovilesMax;
-    private FluidoEstado estado;
     private float velNoiseMin, velNoiseMax, dVelNoise, velNoise;
     private float diametroMin, diametroMax, diametro;
     private float desviacionMax;
@@ -46,20 +44,54 @@ public class Fluido {
     private int dIndPosMin, dIndPosMax;
     private int colorOn;
     private List<PVector> posiciones, normales;
-    private boolean running, finRecorridoPrimero, finRecorridoUltimo, llenar, vaciar;
+    private boolean llenar, vaciar;
     private String codigo;
 
     public Fluido() {
         lstMoviles = new ArrayList<>();
-        estado = VACIO;
+        fluidosOrigen = new ArrayList<>();
     }
 
     public void update() {
+        if (!fluidosOrigen.isEmpty()) {
+            boolean origenFinRecorridoPrimero = false;
+            for (Fluido fluido : fluidosOrigen) {
+                origenFinRecorridoPrimero = fluido.isFinRecorridoPrimero();
+                if (origenFinRecorridoPrimero) break;
+            }
+            if (origenFinRecorridoPrimero && !isLleno() && !llenar) llenar = true;
+            boolean origenVacio = true;
+            for (Fluido fluido : fluidosOrigen) {
+                origenVacio = origenVacio && fluido.isVacio();
+            }
+            if (origenVacio && !isVacio() && !vaciar) vaciar = true;
+        }
+        if (llenar) agregarMovil();
+        if (vaciar) eliminarMovilesAlLlegar();
         lstMoviles.forEach(Movil::update);
     }
 
     public void draw() {
         lstMoviles.forEach(Movil::draw);
+    }
+
+    public void start() {
+        if (!isLleno() && !llenar) {
+            llenar = true;
+            vaciar = false;
+        }
+    }
+
+    public void stop() {
+        if (!isVacio() && !vaciar) {
+            vaciar = true;
+            llenar = false;
+        }
+    }
+
+    public void conmutarEstado() {
+        if (isRunning()) stop();
+        else start();
     }
 
     public float getFactorLlenado() {
@@ -121,12 +153,6 @@ public class Fluido {
         return false;
     }
 
-    public boolean isFinRecorridoUltimo() {
-        if (lstMoviles.isEmpty()) return true;
-        if (!finRecorridoUltimo) finRecorridoUltimo = estado == VACIAR && lstMoviles.getLast().isFinRecorrido();
-        return finRecorridoUltimo;
-    }
-
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
     public void setImg(PImage img) {
         this.img = img;
@@ -138,16 +164,6 @@ public class Fluido {
 
     public boolean isVaciar() {
         return vaciar;
-    }
-
-    public void setVaciar(boolean vaciar) {
-        this.vaciar = vaciar;
-        if (vaciar) llenar = false;
-    }
-
-    public void setLlenar(boolean llenar) {
-        this.llenar = llenar;
-        if (llenar) vaciar = false;
     }
 
     public void setSketch(PApplet sketch) {
@@ -202,15 +218,7 @@ public class Fluido {
     }
 
     public boolean isRunning() {
-        return running;
-    }
-
-    public FluidoEstado getEstado() {
-        return estado;
-    }
-
-    public void setEstado(FluidoEstado estado) {
-        this.estado = estado;
+        return !lstMoviles.isEmpty();
     }
 
     public String getCodigo() {
@@ -219,6 +227,10 @@ public class Fluido {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
+    }
+
+    public void agregarFluidoOrigen(Fluido fluidoOrigen) {
+        fluidosOrigen.add(fluidoOrigen);
     }
 // </editor-fold>
 }
