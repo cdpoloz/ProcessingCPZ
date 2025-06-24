@@ -155,5 +155,9 @@ public class Movil {
     public void setDeltaIndPos(float deltaIndPos) {
         this.deltaIndPos = deltaIndPos;
     }
+
+    public PVector getPos() {
+        return pos;
+    }
 // </editor-fold>
 }
