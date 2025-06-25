@@ -40,9 +40,6 @@ public class Constantes {
     public enum ColorComponente {
         RED, GREEN, BLUE, ALPHA
     };
-    public enum FluidoEstado {
-        LLENAR, LLENO, VACIAR, VACIO
-    }
     public static final MathContext MATH_CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
     public static final int BARRA_ESPACIADORA = 32;
     public static final int BACKSPACE = 8;

@@ -44,7 +44,7 @@ public class Fluido {
     private int dIndPosMin, dIndPosMax;
     private int colorOn;
     private List<PVector> posiciones, normales;
-    private boolean llenar, vaciar;
+    private boolean llenar, vaciar, run;
     private String codigo;
 
     public Fluido() {
@@ -66,7 +66,7 @@ public class Fluido {
             }
             if (origenVacio && !isVacio() && !vaciar) vaciar = true;
         }
-        if (llenar) agregarMovil();
+        if (llenar && run) agregarMovil();
         if (vaciar) eliminarMovilesAlLlegar();
         lstMoviles.forEach(Movil::update);
     }
@@ -90,6 +90,7 @@ public class Fluido {
     }
 
     public void conmutarEstado() {
+        if (!run) return;
         if (isRunning()) stop();
         else start();
     }
@@ -98,7 +99,7 @@ public class Fluido {
         return (float) lstMoviles.size() / cantidadMovilesMax;
     }
 
-    public void agregarMovil() {
+    private void agregarMovil() {
         Movil m = new Movil(sketch);
         m.setImg(img);
         m.setDiametro(sketch.random(diametroMin, diametroMax));
@@ -231,6 +232,15 @@ public class Fluido {
 
     public void agregarFluidoOrigen(Fluido fluidoOrigen) {
         fluidosOrigen.add(fluidoOrigen);
+    }
+
+    public void setRun(boolean run) {
+        this.run = run;
+        if (!run) vaciar = true;
+    }
+
+    public boolean isRun() {
+        return run;
     }
 // </editor-fold>
 }
