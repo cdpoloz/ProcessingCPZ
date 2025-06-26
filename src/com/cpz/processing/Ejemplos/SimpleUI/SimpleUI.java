@@ -30,21 +30,16 @@
  * de los controles es completamente personalizable mediante el reemplazo de estos
  * archivos.
  *
- * Se incluye el paquete 'Input' en el que se encuentran las implementaciones
- * de las interfaces InputMouse e InputTeclado. Cada ejemplo tiene su propio
- * paquete 'Input' porque las implementaciones de los eventos de teclado y
- * ratón pueden variar dependiendo del sketch de ejemplo.
  */
 
 package com.cpz.processing.Ejemplos.SimpleUI;
 
 import com.cpz.processing.Bean.PerlinVector;
 import com.cpz.processing.Bean.Timer;
-import com.cpz.processing.Ejemplos.SimpleUI.Input.Mouse;
-import com.cpz.processing.Ejemplos.SimpleUI.Input.Teclado;
 import com.cpz.processing.UI.Barra;
 import com.cpz.processing.UI.Label;
 import com.cpz.processing.UI.Switch;
+import com.cpz.processing.Util.Calc;
 import processing.core.PApplet;
 import processing.core.PVector;
 import processing.event.MouseEvent;
@@ -61,8 +56,6 @@ public class SimpleUI extends PApplet {
     private Switch sw, swInd;
     private Timer timerSwInd;
     private PerlinVector perlin;
-    private Mouse mouse;
-    private Teclado teclado;
 
     @Override
     public void settings() {
@@ -72,11 +65,9 @@ public class SimpleUI extends PApplet {
 
     @Override
     public void setup() {
-        surface.setTitle("ProcessingCPZ - Ejemplos");
+        surface.setTitle("cpzProcessing - SimpleUI");
         frameRate(60);
 
-        mouse = new Mouse();
-        teclado = new Teclado();
         lblTitulo1 = new Label();
         lblTitulo1.setSketch(this);
         lblTitulo1.setPos(50, 50);
@@ -218,23 +209,46 @@ public class SimpleUI extends PApplet {
 
     @Override
     public void mouseReleased() {
-        mouse.mouseReleased(mouseButton, sw);
-        mouse.mouseReleased(mouseButton, bar);
+        if (mouseButton == PApplet.LEFT && sw.isHovering()) {
+            sw.conmutarEstado();
+        } else if (mouseButton == PApplet.RIGHT && bar.isHovering()) {
+            BigDecimal valor = bar.getValor();
+            if (valor.compareTo(BigDecimal.ZERO) > 0) bar.setValor(BigDecimal.ZERO);
+            else bar.setValor(BigDecimal.ONE);
+        }
     }
 
     @Override
     public void mouseWheel(MouseEvent event) {
-        mouse.mouseWheel(event.getCount(), bar);
+        if (bar.isHovering()) bar.setValorPorMouse(event.getCount());
     }
 
     @Override
     public void mouseDragged() {
-        mouse.mouseDragged(mouseButton, bar);
+        if (mouseButton == LEFT && bar.isHovering()) mouseDraggedLeftBarra(bar);
+    }
+
+    private void mouseDraggedLeftBarra(Barra bar) {
+        if (bar == null) return;
+        BigDecimal posMin, posMax;
+        BigDecimal valorMin = bar.getValorMin();
+        BigDecimal valorMax = bar.getValorMax();
+        BigDecimal valor;
+        if (bar.getOrientacion() == Orientacion.HORIZONTAL) {
+            posMin = new BigDecimal(bar.getEsquina(Esquina.SUP_IZQ).x);
+            posMax = new BigDecimal(bar.getEsquina(Esquina.SUP_DER).x);
+            valor = Calc.map(new BigDecimal(mouseX), posMin, posMax, valorMin, valorMax);
+        } else {
+            posMax = new BigDecimal(bar.getEsquina(Esquina.SUP_IZQ).y);
+            posMin = new BigDecimal(bar.getEsquina(Esquina.INF_IZQ).y);
+            valor = Calc.map(new BigDecimal(mouseY), posMin, posMax, valorMin, valorMax);
+        }
+        bar.setValor(valor);
     }
 
     @Override
     public void keyReleased() {
-        teclado.keyReleased(key, keyCode, sw);
+        if (keyCode == BARRA_ESPACIADORA) sw.conmutarEstado();
     }
 
 }

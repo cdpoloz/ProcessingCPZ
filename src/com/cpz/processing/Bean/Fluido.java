@@ -16,9 +16,9 @@
 
 package com.cpz.processing.Bean;
 
+import com.cpz.processing.Interfaces.Identificable;
 import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
-import processing.core.PImage;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -29,12 +29,12 @@ import static processing.core.PApplet.constrain;
 /**
  * @author CPZ
  */
-public class Fluido {
+public class Fluido implements Identificable {
 
     private final List<Movil> lstMoviles;
     private final List<Fluido> fluidosOrigen;
     private PApplet sketch;
-    private PImage img;
+    private Object img;
     private int cantidadMovilesMax;
     private float velNoiseMin, velNoiseMax, dVelNoise, velNoise;
     private float diametroMin, diametroMax, diametro;
@@ -42,7 +42,7 @@ public class Fluido {
     private float alfaMin, alfaMax;
     private int periodo;
     private int dIndPosMin, dIndPosMax;
-    private int colorOn;
+    private int colorRelleno;
     private List<PVector> posiciones, normales;
     private boolean llenar, vaciar, run;
     private String codigo;
@@ -53,7 +53,7 @@ public class Fluido {
     }
 
     public void update() {
-        if (!fluidosOrigen.isEmpty()) {
+        if (!fluidosOrigen.isEmpty() && run) {
             boolean origenFinRecorridoPrimero = false;
             for (Fluido fluido : fluidosOrigen) {
                 origenFinRecorridoPrimero = fluido.isFinRecorridoPrimero();
@@ -103,7 +103,7 @@ public class Fluido {
         Movil m = new Movil(sketch);
         m.setImg(img);
         m.setDiametro(sketch.random(diametroMin, diametroMax));
-        m.setColorRelleno(colorOn);
+        m.setColorRelleno(colorRelleno);
         m.setDesviacionMax(desviacionMax);
         m.setPeriodo(periodo);
         m.setRangoAlfa(alfaMin, alfaMax);
@@ -117,13 +117,15 @@ public class Fluido {
     }
 
     public void eliminarMovilesAlLlegar() {
-        if (lstMoviles.isEmpty()) return;
+        if (lstMoviles.isEmpty()) {
+            vaciar = false;
+            return;
+        }
         for (int i = lstMoviles.size() - 1; i >= 0; i--) {
             if (lstMoviles.get(i).isFinRecorrido()) {
                 lstMoviles.remove(i);
             }
         }
-        if (lstMoviles.isEmpty()) vaciar = false;
     }
 
     public boolean isLleno() {
@@ -155,8 +157,9 @@ public class Fluido {
     }
 
     // <editor-fold defaultstate="collapsed" desc="*** setter & getter ***">
-    public void setImg(PImage img) {
+    public void setImg(Object img) {
         this.img = img;
+        lstMoviles.forEach(m -> m.setImg(img));
     }
 
     public boolean isLlenar() {
@@ -213,19 +216,21 @@ public class Fluido {
         this.dIndPosMax = dIndPosMax;
     }
 
-    public void setColorOn(int colorOn) {
-        this.colorOn = colorOn;
-        lstMoviles.forEach(m -> m.setColorRelleno(colorOn));
+    public void setColorRelleno(int colorRelleno) {
+        this.colorRelleno = colorRelleno;
+        lstMoviles.forEach(m -> m.setColorRelleno(colorRelleno));
     }
 
     public boolean isRunning() {
         return !lstMoviles.isEmpty();
     }
 
+    @Override
     public String getCodigo() {
         return codigo;
     }
 
+    @Override
     public void setCodigo(String codigo) {
         this.codigo = codigo;
     }
@@ -241,6 +246,10 @@ public class Fluido {
 
     public boolean isRun() {
         return run;
+    }
+
+    public List<Fluido> getFluidosOrigen() {
+        return fluidosOrigen;
     }
 // </editor-fold>
 }

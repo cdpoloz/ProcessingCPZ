@@ -25,7 +25,8 @@ public class Launcher extends PApplet {
     public static void main(String[] args) {
         Locale.setDefault(Locale.forLanguageTag("en-US"));
         //String sketchParaEjecutar = "com.cpz.processing.Ejemplos.SimpleUI.SimpleUI";
-        String sketchParaEjecutar = "com.cpz.processing.Ejemplos.Fluidos.FluidoSimple";
+        //String sketchParaEjecutar = "com.cpz.processing.Ejemplos.Fluidos.FluidoSimple";
+        String sketchParaEjecutar = "com.cpz.processing.Test.FluidoSimpleTest";
         PApplet.main(new String[]{sketchParaEjecutar});
         //PApplet.main(new String[]{"--present", sketchParaEjecutar}); // ejecución en pantalla completa
     }

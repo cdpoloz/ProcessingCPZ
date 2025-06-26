@@ -19,6 +19,7 @@ package com.cpz.processing.Bean;
 import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import processing.core.PImage;
+import processing.core.PShape;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ public class Movil {
 
     private final PApplet sketch;
     private final PVector pos;
-    private PImage img;
+    private final Timer timer;
+    private Object img;
     private int colorRelleno, indPos, periodo;
     private float alfaMin;
     private float alfaMax;
@@ -43,7 +45,6 @@ public class Movil {
     private float dOffset;
     private float desviacionMax;
     private float diametro;
-    private final Timer timer;
     private List<PVector> lstPos, lstNormal;
     private float deltaIndPos;
     private boolean finRecorrido;
@@ -81,11 +82,19 @@ public class Movil {
     }
 
     public void draw() {
-        sketch.imageMode(CENTER);
-        sketch.tint(colorRelleno);
-        sketch.image(img, pos.x, pos.y, diametro, diametro);
-        sketch.tint(255, 255);
-        sketch.imageMode(CORNER);
+        if (img instanceof PImage) {
+            sketch.imageMode(CENTER);
+            sketch.tint(colorRelleno);
+            sketch.image((PImage) img, pos.x, pos.y, diametro, diametro);
+            sketch.tint(255, 255);
+            sketch.imageMode(CORNER);
+        } else if (img instanceof PShape) {
+            sketch.shapeMode(CENTER);
+            sketch.noStroke();
+            sketch.fill(colorRelleno);
+            sketch.shape((PShape) img, pos.x, pos.y, diametro, diametro);
+            sketch.shapeMode(CORNER);
+        }
     }
 
     private void reiniciarCondiciones() {
@@ -99,7 +108,8 @@ public class Movil {
         this.colorRelleno = colorRelleno;
     }
 
-    public void setImg(PImage img) {
+    public void setImg(Object img) {
+        if (img instanceof PShape) ((PShape) img).disableStyle();
         this.img = img;
     }
 

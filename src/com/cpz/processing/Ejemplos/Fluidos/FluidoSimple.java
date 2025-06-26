@@ -14,171 +14,175 @@
  * limitations under the License.
  */
 
+/*
+ * cpzProcessing - FluidoSimple
+ *
+ * Ejemplo de visualización de flujos de partículas a lo largo de trayectorias.
+ *
+ * Este sketch demuestra el uso de los componentes Fluido y Movil para representar
+ * el movimiento de partículas simulando un flujo animado, dividido en múltiples
+ * segmentos con trayectorias personalizadas y combinación de fuentes.
+ *
+ * Cada segmento puede actuar como fuente u origen de partículas, o como
+ * colector de uno o más flujos anteriores. Se emplean normales para definir
+ * la aleatoriedad del movimiento, ruido Perlin para suavizar las trayectorias
+ * y controles de teclado para iniciar, detener o conmutar el estado de cada
+ * uno de los flujos, así como para habilitar un segmento adicional.
+ *
+ * Las trayectorias están definidas en coordenadas relativas (0.0–1.0), lo
+ * que permite una fácil adaptación a cualquier resolución.
+ *
+ * Los objetos de tipo Movil podrían usar archivos de imágenes personalizados en
+ * vez de los archivos incluidos por defecto. Si se opta por usar objetos PShape
+ * se recomienda el uso de archivos de tipo 'Plain SVG' aunque también se pueden
+ * usar archivos SVG exportados de Inkscape, Adobe Illustrator u otros. La
+ * apariencia visual de los fluidos completamente personalizable mediante el
+ * reemplazo de estos archivos.
+ *
+ */
+
 package com.cpz.processing.Ejemplos.Fluidos;
 
 import com.cpz.processing.Bean.Fluido;
 import com.cpz.processing.UI.Label;
+import com.cpz.processing.Util.Tools;
 import processing.core.PApplet;
-import processing.core.PImage;
 import processing.core.PVector;
-import processing.event.MouseEvent;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cpz.processing.Util.Tools;
-
-import static com.cpz.processing.Util.Constantes.*;
+import static com.cpz.processing.Util.Constantes.AlineaX;
+import static com.cpz.processing.Util.Constantes.AlineaY;
 
 /**
  * @author CPZ
  */
 public class FluidoSimple extends PApplet {
 
-    private PVector pResultado1, pResultado2, p11, p12, p21, p22, pExtra1, pExtra2;
-    private Fluido fluidoResultado, fluido1, fluido2, fluidoExtra;
+    private PVector pIniOrigen1, pFinOrigen1;
+    private PVector pIniOrigen2, pFinOrigen2;
+    private PVector pIniSuma, pFinSuma;
+    private PVector pIniExtra, pFinExtra;
+    private Fluido fluidoOrigen1, fluidoOrigen2, fluidoSuma, fluidoExtra;
+    private int colorFondo1, colorFondo2, colorFondoSuma, colorFondoExtra, colorRelleno, colorOff;
     private Label lbl;
 
     // CONFIGURACIÓN PREVIA A SETUP ********************************************
     @Override
     public void settings() {
-        size(960, 496, P2D);
-        //size(1920, 993, P2D);
+        size(1200, 675, P2D);
         smooth(8);
-    }
 
-    // CONFIGURACIÓN DE VARIABLES **********************************************
-    @Override
-    public void setup() {
-        surface.setTitle("Fluido simple");
-        frameRate(60);
-        // imagen
-        PImage img = loadImage("data" + File.separator + "img" + File.separator + "circuloBlur.png");
-        // cálculo de trayectoria (solo si es que se quiere hacer en runtime)
+        // *** COLORES
+        colorRelleno = color(255, 0, 100);
+        colorOff = color(80, 87, 89);
+
+        // *** TRAYECTORIA - se calcula la trayectoria entre los puntos de inicio y fin de cada segmento
         float distMin = 0f;
-        float distMax = 2.236068f;
-        // cálculo para fluido 1
-        p11 = new PVector(2500.580f / 3840f, 1536.118f / 1986f);
-        p12 = new PVector(2000.580f / 3840f, 1643.613f / 1986f);
-        PVector normal1 = Tools.calcularNormal(p11, p12);
-        float dist1 = PVector.dist(p11, p12);
-        int pasos1 = (int) map(dist1, distMin, distMax, 50, 800);
-        List<PVector> posiciones1 = Tools.calcularPosicionesEnRecta(p11, p12, pasos1);
+        float distMax = 1.777778f; // se asume como distancia máxima la diagonal para una ventana de formato 16:9
+        // la cantidad de pasos en las que se divide cada segmento dependiendo de su longitud
+        int pasosMin = 50;
+        int pasosMax = 900;
+
+        // cálculo para fluido origen 1
+        pIniOrigen1 = new PVector(0.05f, 0.05f);
+        pFinOrigen1 = new PVector(0.35f, 0.23f);
+        PVector normal1 = Tools.calcularNormal(pIniOrigen1, pFinOrigen1);
+        float dist1 = PVector.dist(pIniOrigen1, pFinOrigen1);
+        int pasos1 = (int) map(dist1, distMin, distMax, pasosMin, pasosMax);
+        List<PVector> posiciones1 = Tools.calcularPosicionesEnRecta(pIniOrigen1, pFinOrigen1, pasos1);
         List<PVector> normales1 = new ArrayList<>();
         for (int i = 0; i < posiciones1.size(); i++) {
             normales1.add(normal1);
         }
-        fluido1 = new Fluido();
-        fluido1.setSketch(this);
-        fluido1.setImg(img);
-        fluido1.setCantidadMovilesMax(100);
-        fluido1.setRangDeltaIndPos(1, 3);
-        fluido1.setColorOn(color(255, 0, 100));
-        fluido1.setRangoAlfaMovil(0.01f, 0.80f);
-        fluido1.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
-        fluido1.setPeriodo(15);
-        fluido1.setDesviacionMax(0.005f);
-        fluido1.setRangoDiametro(0.01f, 0.015f);
-        fluido1.setPosiciones(posiciones1);
-        fluido1.setNormales(normales1);
-        fluido1.setRun(true);
-        System.out.println("fluido 1");
-        for (int i = 0; i < posiciones1.size(); i++) {
-            PVector p = posiciones1.get(i);
-            PVector n = normales1.get(i);
-            String s = String.format("%,6f", p.x) + "," + String.format("%,6f", p.y) + "," + String.format("%,6f", n.x) + "," + String.format("%,6f", n.y);
-            System.out.println(s);
-        }
-        System.out.println();
+        fluidoOrigen1 = new Fluido();
+        fluidoOrigen1.setSketch(this);
+        fluidoOrigen1.setCodigo("fOrigen1");
+        fluidoOrigen1.setCantidadMovilesMax(100);
+        fluidoOrigen1.setRangDeltaIndPos(1, 3);
+        fluidoOrigen1.setColorRelleno(colorRelleno);
+        fluidoOrigen1.setRangoAlfaMovil(0.01f, 0.80f);
+        fluidoOrigen1.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
+        fluidoOrigen1.setPeriodo(15);
+        fluidoOrigen1.setDesviacionMax(0.005f);
+        fluidoOrigen1.setRangoDiametro(0.01f, 0.015f);
+        fluidoOrigen1.setPosiciones(posiciones1);
+        fluidoOrigen1.setNormales(normales1);
+        fluidoOrigen1.setRun(true);
 
-        // cálculo para fluido 2
-        p21 = new PVector(2500.580f / 3840f, 1000f / 1986f);
-        p22 = new PVector(2000.580f / 3840f, 1643.613f / 1986f);
-        PVector normal2 = Tools.calcularNormal(p21, p22);
-        float dist2 = PVector.dist(p21, p22);
-        int pasos2 = (int) map(dist2, distMin, distMax, 50, 800);
-        List<PVector> posiciones2 = Tools.calcularPosicionesEnRecta(p21, p22, pasos2);
+        // cálculo para fluido origen 2
+        pIniOrigen2 = new PVector(0.62f, 0.17f);
+        pFinOrigen2 = new PVector(0.35f, 0.23f);
+        PVector normal2 = Tools.calcularNormal(pIniOrigen2, pFinOrigen2);
+        float dist2 = PVector.dist(pIniOrigen2, pFinOrigen2);
+        int pasos2 = (int) map(dist2, distMin, distMax, pasosMin, pasosMax);
+        List<PVector> posiciones2 = Tools.calcularPosicionesEnRecta(pIniOrigen2, pFinOrigen2, pasos2);
         List<PVector> normales2 = new ArrayList<>();
         for (int i = 0; i < posiciones2.size(); i++) {
             normales2.add(normal2);
         }
-        fluido2 = new Fluido();
-        fluido2.setSketch(this);
-        fluido2.setImg(img);
-        fluido2.setCantidadMovilesMax(100);
-        fluido2.setRangDeltaIndPos(1, 3);
-        fluido2.setColorOn(color(255, 0, 100));
-        fluido2.setRangoAlfaMovil(0.01f, 0.80f);
-        fluido2.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
-        fluido2.setPeriodo(15);
-        fluido2.setDesviacionMax(0.005f);
-        fluido2.setRangoDiametro(0.01f, 0.015f);
-        fluido2.setPosiciones(posiciones2);
-        fluido2.setNormales(normales2);
-        fluido2.setRun(true);
-        System.out.println("fluido 2");
-        for (int i = 0; i < posiciones2.size(); i++) {
-            PVector p = posiciones2.get(i);
-            PVector n = normales2.get(i);
-            String s = String.format("%,6f", p.x) + "," + String.format("%,6f", p.y) + "," + String.format("%,6f", n.x) + "," + String.format("%,6f", n.y);
-            System.out.println(s);
-        }
-        System.out.println();
+        fluidoOrigen2 = new Fluido();
+        fluidoOrigen2.setSketch(this);
+        fluidoOrigen2.setCodigo("fOrigen2");
+        fluidoOrigen2.setCantidadMovilesMax(100);
+        fluidoOrigen2.setRangDeltaIndPos(1, 3);
+        fluidoOrigen2.setColorRelleno(colorRelleno);
+        fluidoOrigen2.setRangoAlfaMovil(0.01f, 0.80f);
+        fluidoOrigen2.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
+        fluidoOrigen2.setPeriodo(15);
+        fluidoOrigen2.setDesviacionMax(0.005f);
+        fluidoOrigen2.setRangoDiametro(0.01f, 0.015f);
+        fluidoOrigen2.setPosiciones(posiciones2);
+        fluidoOrigen2.setNormales(normales2);
+        fluidoOrigen2.setRun(true);
 
-        // cálculo para fluido resultado
-        pResultado1 = new PVector(1805.824f / 3840f, 1754.332f / 1986f);
-        pResultado2 = new PVector(1300.338f / 3840f, 1754.332f / 1986f);
-        PVector normalResultado = Tools.calcularNormal(pResultado1, pResultado2);
-        float distResultado = PVector.dist(pResultado1, pResultado2);
-        int pasosResultado = (int) map(distResultado, distMin, distMax, 50, 800);
-        List<PVector> posicionesResultado = Tools.calcularPosicionesEnRecta(pResultado1, pResultado2, pasosResultado);
-        List<PVector> normalesResultado = new ArrayList<>();
-        for (int i = 0; i < posicionesResultado.size(); i++) {
-            normalesResultado.add(normalResultado);
+        // cálculo para fluido suma
+        pIniSuma = new PVector(0.35f, 0.23f);
+        pFinSuma = new PVector(0.65f, 0.71f);
+        PVector normalSuma = Tools.calcularNormal(pIniSuma, pFinSuma);
+        float distSuma = PVector.dist(pIniSuma, pFinSuma);
+        int pasosSuma = (int) map(distSuma, distMin, distMax, pasosMin, pasosMax);
+        List<PVector> posicionesSuma = Tools.calcularPosicionesEnRecta(pIniSuma, pFinSuma, pasosSuma);
+        List<PVector> normalesSuma = new ArrayList<>();
+        for (int i = 0; i < posicionesSuma.size(); i++) {
+            normalesSuma.add(normalSuma);
         }
-        fluidoResultado = new Fluido();
-        fluidoResultado.setSketch(this);
-        fluidoResultado.setImg(img);
-        fluidoResultado.setCantidadMovilesMax(100);
-        fluidoResultado.setRangDeltaIndPos(1, 3);
-        fluidoResultado.setColorOn(color(255, 0, 100));
-        fluidoResultado.setRangoAlfaMovil(0.01f, 0.80f);
-        fluidoResultado.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
-        fluidoResultado.setPeriodo(15);
-        fluidoResultado.setDesviacionMax(0.005f);
-        fluidoResultado.setRangoDiametro(0.01f, 0.015f);
-        fluidoResultado.setPosiciones(posicionesResultado);
-        fluidoResultado.setNormales(normalesResultado);
-        fluidoResultado.setRun(true);
-        fluidoResultado.agregarFluidoOrigen(fluido1);
-        fluidoResultado.agregarFluidoOrigen(fluido2);
-        System.out.println("fluido resultado");
-        for (int i = 0; i < posicionesResultado.size(); i++) {
-            PVector p = posicionesResultado.get(i);
-            PVector n = normalesResultado.get(i);
-            String s = String.format("%,6f", p.x) + "," + String.format("%,6f", p.y) + "," + String.format("%,6f", n.x) + "," + String.format("%,6f", n.y);
-            System.out.println(s);
-        }
-        System.out.println();
+        fluidoSuma = new Fluido();
+        fluidoSuma.setSketch(this);
+        fluidoSuma.setCodigo("fSuma");
+        fluidoSuma.setCantidadMovilesMax(200);
+        fluidoSuma.setRangDeltaIndPos(1, 3);
+        fluidoSuma.setColorRelleno(colorRelleno);
+        fluidoSuma.setRangoAlfaMovil(0.01f, 0.80f);
+        fluidoSuma.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
+        fluidoSuma.setPeriodo(15);
+        fluidoSuma.setDesviacionMax(0.005f);
+        fluidoSuma.setRangoDiametro(0.01f, 0.015f);
+        fluidoSuma.setPosiciones(posicionesSuma);
+        fluidoSuma.setNormales(normalesSuma);
+        fluidoSuma.setRun(true);
+        fluidoSuma.agregarFluidoOrigen(fluidoOrigen1);
+        fluidoSuma.agregarFluidoOrigen(fluidoOrigen2);
 
         // cálculo para fluido extra
-        pExtra1 = new PVector(1000f / 3840f, 1200f / 1986f);
-        pExtra2 = new PVector(500f / 3840f, 500f / 1986f);
-        PVector normalExtra = Tools.calcularNormal(pExtra1, pExtra2);
-        float distExtra = PVector.dist(pExtra1, pExtra2);
-        int pasosExtra = (int) map(distExtra, distMin, distMax, 50, 800);
-        List<PVector> posicionesExtra = Tools.calcularPosicionesEnRecta(pExtra1, pExtra2, pasosExtra);
+        pIniExtra = new PVector(0.65f, 0.71f);
+        pFinExtra = new PVector(0.95f, 0.95f);
+        PVector normalExtra = Tools.calcularNormal(pIniExtra, pFinExtra);
+        float distExtra = PVector.dist(pIniExtra, pFinExtra);
+        int pasosExtra = (int) map(distExtra, distMin, distMax, pasosMin, pasosMax);
+        List<PVector> posicionesExtra = Tools.calcularPosicionesEnRecta(pIniExtra, pFinExtra, pasosExtra);
         List<PVector> normalesExtra = new ArrayList<>();
         for (int i = 0; i < posicionesExtra.size(); i++) {
             normalesExtra.add(normalExtra);
         }
         fluidoExtra = new Fluido();
         fluidoExtra.setSketch(this);
-        fluidoExtra.setImg(img);
-        fluidoExtra.setCantidadMovilesMax(100);
+        fluidoExtra.setCodigo("fExtra");
+        fluidoExtra.setCantidadMovilesMax(200);
         fluidoExtra.setRangDeltaIndPos(1, 3);
-        fluidoExtra.setColorOn(color(255, 0, 100));
+        fluidoExtra.setColorRelleno(colorRelleno);
         fluidoExtra.setRangoAlfaMovil(0.01f, 0.80f);
         fluidoExtra.setRangoVelocidadNoise(0.055f, 0.200f, 0.005f);
         fluidoExtra.setPeriodo(15);
@@ -186,117 +190,117 @@ public class FluidoSimple extends PApplet {
         fluidoExtra.setRangoDiametro(0.01f, 0.015f);
         fluidoExtra.setPosiciones(posicionesExtra);
         fluidoExtra.setNormales(normalesExtra);
-        fluidoExtra.agregarFluidoOrigen(fluidoResultado);
+        fluidoExtra.agregarFluidoOrigen(fluidoSuma);
         fluidoExtra.setRun(false);
-        System.out.println("fluido extra");
-        for (int i = 0; i < posicionesExtra.size(); i++) {
-            PVector p = posicionesExtra.get(i);
-            PVector n = normalesExtra.get(i);
-            String s = String.format("%,6f", p.x) + "," + String.format("%,6f", p.y) + "," + String.format("%,6f", n.x) + "," + String.format("%,6f", n.y);
-            System.out.println(s);
-        }
-        System.out.println();
-        // label temporal
+
         lbl = new Label();
         lbl.setSketch(this);
         lbl.setDisplay(true);
         lbl.setAlineaX(AlineaX.IZQ);
         lbl.setAlineaY(AlineaY.SUP);
         lbl.setColorTexto(color(255));
-        lbl.setPos(0.8f * width, 0.25f * height);
+        lbl.setPos(0.04f * width, 0.25f * height);
         lbl.setTamTexto(22);
+    }
+
+    // CONFIGURACIÓN DE VARIABLES **********************************************
+    @Override
+    public void setup() {
+        surface.setTitle("cpzProcessing - Fluido simple");
+        frameRate(60);
+        textFont(createFont("Consolas", 22));
+
+        // *** IMAGEN - aquí puedes elegir si quieres usar un objeto PImage o PShape
+        Object img = loadImage("data" + File.separator + "img" + File.separator + "circuloBlur.png");
+        //Object img = loadShape("data" + File.separator + "img" + File.separator + "shape.svg");
+
+        fluidoOrigen1.setImg(img);
+        fluidoOrigen2.setImg(img);
+        fluidoSuma.setImg(img);
+        fluidoExtra.setImg(img);
     }
 
     // PROGRAMA PRINCIPAL ******************************************************
     @Override
     public void draw() {
         // update
-        fluido1.update();
-        fluido2.update();
-        fluidoResultado.update();
+        fluidoOrigen1.update();
+        fluidoOrigen2.update();
+        fluidoSuma.update();
         fluidoExtra.update();
-        // color fondo fluido 1
-        float alfaFondoMin = 0.1f;
-        float alfaFondoMax = 1f;
-        float alfaFondo1 = map(fluido1.getFactorLlenado(), 0, 1, alfaFondoMax, alfaFondoMin);
-        int colorOn = color(255, 0, 120, alfaFondo1 * 255);
-        int colorOff = color(80, 87, 89, alfaFondo1 * 255);
-        int colorFondo1 = lerpColor(colorOff, colorOn, fluido1.getFactorLlenado());
-        // color fondo fluido 2
-        float alfaFondo2 = map(fluido2.getFactorLlenado(), 0, 1, alfaFondoMax, alfaFondoMin);
-        colorOn = color(255, 0, 120, alfaFondo2 * 255);
-        colorOff = color(80, 87, 89, alfaFondo2 * 255);
-        int colorFondo2 = lerpColor(colorOff, colorOn, fluido2.getFactorLlenado());
-        // color fondo fluido resultado
-        float alfaFondoResultado = map(fluidoResultado.getFactorLlenado(), 0, 1, alfaFondoMax, alfaFondoMin);
-        colorOn = color(255, 0, 120, alfaFondoResultado * 255);
-        colorOff = color(80, 87, 89, alfaFondoResultado * 255);
-        int colorFondoResultado = lerpColor(colorOff, colorOn, fluidoResultado.getFactorLlenado());
-        // color fondo fluido extra
-        float alfaFondoExtra = map(fluidoExtra.getFactorLlenado(), 0, 1, alfaFondoMax, alfaFondoMin);
-        colorOn = color(255, 0, 120, alfaFondoExtra * 255);
-        colorOff = color(80, 87, 89, alfaFondoExtra * 255);
-        int colorFondoExtra = lerpColor(colorOff, colorOn, fluidoExtra.getFactorLlenado());
-        // update - label
-        String s = "1.llenar: " + (fluido1.isLlenar() ? "1" : "0") + "\n1.vaciar: " + (fluido1.isVaciar() ? "1" : "0") + "\n\n";
-        s += "2.llenar: " + (fluido2.isLlenar() ? "1" : "0") + "\n2.vaciar: " + (fluido2.isVaciar() ? "1" : "0") + "\n\n";
-        s += "r.llenar: " + (fluidoResultado.isLlenar() ? "1" : "0") + "\nr.vaciar: " + (fluidoResultado.isVaciar() ? "1" : "0") + "\n\n";
-        s += "e.llenar: " + (fluidoExtra.isLlenar() ? "1" : "0") + "\ne.vaciar: " + (fluidoExtra.isVaciar() ? "1" : "0") + "\n\n";
-        lbl.setTexto(s);
+        updateColoresFondo();
+        updateLabel();
         // draw
-        dibujarFondo(colorFondo1, colorFondo2, colorFondoResultado, colorFondoExtra);
-        fluido1.draw();
-        fluido2.draw();
-        fluidoResultado.draw();
+        dibujarFondo();
+        fluidoOrigen1.draw();
+        fluidoOrigen2.draw();
+        fluidoSuma.draw();
         fluidoExtra.draw();
         lbl.draw();
     }
 
-    public void dibujarFondo(int colorFondo1, int colorFondo2, int colorFondoResultado, int colorFondoExtra) {
+    private void updateColoresFondo() {
+        colorFondo1 = calcularColorFondo(fluidoOrigen1);
+        colorFondo2 = calcularColorFondo(fluidoOrigen2);
+        colorFondoSuma = calcularColorFondo(fluidoSuma);
+        colorFondoExtra = calcularColorFondo(fluidoExtra);
+    }
+
+    private int calcularColorFondo(Fluido fluido) {
+        if (fluido == null) {
+            return 0;
+        }
+        float alfaFondoMin = 0.15f;
+        float alfaFondoMax = 1f;
+        float alfaFondo = map(fluido.getFactorLlenado(), 0, 1, alfaFondoMax, alfaFondoMin);
+        colorRelleno = color(red(colorRelleno), green(colorRelleno), blue(colorRelleno), alfaFondo * 255);
+        colorOff = color(red(colorOff), green(colorOff), blue(colorOff), alfaFondo * 255);
+        return lerpColor(colorOff, colorRelleno, fluido.getFactorLlenado());
+    }
+
+    private void updateLabel() {
+        String s = "";
+        s += "Factores de llenado:\n\n";
+        s += "fOrigen1: " + String.format("%.2f", fluidoOrigen1.getFactorLlenado()) + " (" + (fluidoOrigen1.isRun() ? "on" : "off") + ")\n";
+        s += "fOrigen2: " + String.format("%.2f", fluidoOrigen2.getFactorLlenado()) + " (" + (fluidoOrigen2.isRun() ? "on" : "off") + ")\n";
+        s += "fSuma   : " + String.format("%.2f", fluidoSuma.getFactorLlenado()) + " (" + (fluidoSuma.isRun() ? "on" : "off") + ")\n";
+        s += "fExtra  : " + String.format("%.2f", fluidoExtra.getFactorLlenado()) + " (" + (fluidoExtra.isRun() ? "on" : "off") + ")\n\n";
+        s += "Controles de teclado:\n\n";
+        s += "'w' → conmutar estado de ambos fluidos origen\n";
+        s += "'e' → iniciar fluido origen 1\n";
+        s += "'r' → iniciar fluido origen 2\n";
+        s += "'d' → detener fluido origen 1\n";
+        s += "'f' → detener fluido origen 2\n";
+        s += "'c' → habilitar/deshabilitar segmento extra\n";
+        lbl.setTexto(s);
+    }
+
+    public void dibujarFondo() {
         background(32);
         strokeWeight(10);
-        stroke(colorFondo1);
-        line(p11.x * width, p11.y * height, p12.x * width, p12.y * height);
-        stroke(colorFondo2);
-        line(p21.x * width, p21.y * height, p22.x * width, p22.y * height);
-        stroke(colorFondoResultado);
-        line(pResultado1.x * width, pResultado1.y * height, pResultado2.x * width, pResultado2.y * height);
         stroke(colorFondoExtra);
-        line(pExtra1.x * width, pExtra1.y * height, pExtra2.x * width, pExtra2.y * height);
+        line(pIniExtra.x * width, pIniExtra.y * height, pFinExtra.x * width, pFinExtra.y * height);
+        stroke(colorFondoSuma);
+        line(pIniSuma.x * width, pIniSuma.y * height, pFinSuma.x * width, pFinSuma.y * height);
+        stroke(colorFondo2);
+        line(pIniOrigen2.x * width, pIniOrigen2.y * height, pFinOrigen2.x * width, pFinOrigen2.y * height);
+        stroke(colorFondo1);
+        line(pIniOrigen1.x * width, pIniOrigen1.y * height, pFinOrigen1.x * width, pFinOrigen1.y * height);
     }
 
     // INTERRUPCIONES DE PROCESSING ********************************************
     @Override
-    public void mouseReleased() {
-        if (mouseButton == RIGHT) fluido1.conmutarEstado();
-        if (mouseButton == LEFT) fluido2.conmutarEstado();
-    }
-
-    @Override
-    public void mouseWheel(MouseEvent event) {
-
-    }
-
-    @Override
     public void keyReleased() {
         switch (key) {
-            case 'e' -> fluido1.start();
-            case 'r' -> fluido1.stop();
-            case 'd' -> fluido2.start();
-            case 'f' -> fluido2.stop();
-            case 'c' -> fluidoExtra.setRun(!fluidoExtra.isRun());
-        }
-        switch (keyCode) {
-            case BARRA_ESPACIADORA -> {
-                fluido1.conmutarEstado();
-                fluido2.conmutarEstado();
+            case 'w' -> {
+                fluidoOrigen1.conmutarEstado();
+                fluidoOrigen2.conmutarEstado();
             }
-            /*
-            case FLECHA_ARRIBA -> fluido2.actualizarVelocidadNoisePorDiferencial("+");
-            case FLECHA_ABAJO -> fluido2.actualizarVelocidadNoisePorDiferencial("-");
-            case FLECHA_DERECHA -> fluido2.setVelocidadNoise(1f);
-            case FLECHA_IZQUIERDA -> fluido2.setVelocidadNoise(0);
-             */
+            case 'e' -> fluidoOrigen1.start();
+            case 'r' -> fluidoOrigen2.start();
+            case 'd' -> fluidoOrigen1.stop();
+            case 'f' -> fluidoOrigen2.stop();
+            case 'c' -> fluidoExtra.setRun(!fluidoExtra.isRun());
         }
     }
 
