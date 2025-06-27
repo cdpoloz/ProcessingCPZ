@@ -37,7 +37,8 @@
  * se recomienda el uso de archivos de tipo 'Plain SVG' aunque también se pueden
  * usar archivos SVG exportados de Inkscape, Adobe Illustrator u otros. La
  * apariencia visual de los fluidos completamente personalizable mediante el
- * reemplazo de estos archivos.
+ * reemplazo de estos archivos. Si se van a mostrar muchos objetos en pantalla
+ * puede convenir usar objetos PImage por cuestiones de rendimiento.
  *
  */
 
