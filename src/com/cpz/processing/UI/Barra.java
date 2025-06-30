@@ -24,6 +24,7 @@ import com.cpz.processing.Util.Constantes.BarraModo;
 import com.cpz.processing.Util.Constantes.Orientacion;
 import com.cpz.processing.Util.Constantes.Esquina;
 import com.cpz.processing.Util.Tools;
+import org.jetbrains.annotations.NotNull;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
@@ -98,7 +99,7 @@ public class Barra implements ElementoUI, Identificable, Editable, Hoverable {
         return Tools.isHovering(sketch.mouseX, sketch.mouseY, pos.x, pos.y, wMax, hMax);
     }
 
-    public void setValor(BigDecimal v) {
+    public void setValor(@NotNull BigDecimal v) {
         valorPrevio = new BigDecimal(valor.toString());
         valor = new BigDecimal(v.toString());
         if (modo == BarraModo.INTERACTIVO) {
