@@ -307,7 +307,7 @@ public class Barra implements ElementoUI, Identificable, Editable, Hoverable {
         return valorMin;
     }
 
-    public void setPos(PVector pos) {
+    public void setPos(@NotNull PVector pos) {
         this.pos.set(pos.x, pos.y);
     }
 

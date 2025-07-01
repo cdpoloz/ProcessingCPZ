@@ -32,7 +32,7 @@
  *
  */
 
-package com.cpz.processing.Ejemplos.SimpleUI;
+package com.cpz.processing.Ejemplos.ElementosUI;
 
 import com.cpz.processing.Bean.PerlinVector;
 import com.cpz.processing.Bean.Timer;
