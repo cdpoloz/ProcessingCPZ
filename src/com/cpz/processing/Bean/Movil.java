@@ -45,6 +45,7 @@ public class Movil {
     private float dOffset;
     private float desviacionMax;
     private float diametro;
+    private float anchoVentana, altoVentana;
     private List<PVector> lstPos, lstNormal;
     private float deltaIndPos;
     private boolean finRecorrido;
@@ -77,7 +78,7 @@ public class Movil {
         float d = sketch.noise(offset);
         d = map(d, 0, 1, -desviacionMax, desviacionMax);
         PVector vDesv = new PVector(normal.x * d, normal.y * d);
-        pos.set((v.x + vDesv.x) * sketch.width, (v.y + vDesv.y) * sketch.height);
+        pos.set((v.x + vDesv.x) * anchoVentana, (v.y + vDesv.y) * altoVentana);
         offset += dOffset;
     }
 
@@ -168,6 +169,11 @@ public class Movil {
 
     public PVector getPos() {
         return pos;
+    }
+
+    public void setDimensionesVentana(float anchoVentana, float altoVentana) {
+        this.anchoVentana = anchoVentana;
+        this.altoVentana = altoVentana;
     }
 // </editor-fold>
 }

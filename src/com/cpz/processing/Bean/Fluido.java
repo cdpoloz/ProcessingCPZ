@@ -40,6 +40,7 @@ public class Fluido implements Identificable {
     private float diametroMin, diametroMax, diametro;
     private float desviacionMax;
     private float alfaMin, alfaMax;
+    private float anchoVentana, altoVentana;
     private int periodo;
     private int dIndPosMin, dIndPosMax;
     private int colorRelleno;
@@ -111,6 +112,7 @@ public class Fluido implements Identificable {
         m.setDeltaIndPos((int) sketch.random(dIndPosMin, dIndPosMax));
         m.setLstPos(posiciones);
         m.setLstNormal(normales);
+        m.setDimensionesVentana(anchoVentana, altoVentana);
         m.setup();
         lstMoviles.add(m);
         if (lstMoviles.size() == cantidadMovilesMax) llenar = false;
@@ -250,6 +252,12 @@ public class Fluido implements Identificable {
 
     public List<Fluido> getFluidosOrigen() {
         return fluidosOrigen;
+    }
+
+    public void setDimensionesVentana(float anchoVentana, float altoVentana) {
+        this.anchoVentana = anchoVentana;
+        this.altoVentana = altoVentana;
+        lstMoviles.forEach(m -> m.setDimensionesVentana(anchoVentana, altoVentana));
     }
 // </editor-fold>
 }

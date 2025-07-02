@@ -111,6 +111,7 @@ public class FluidoSimple extends PApplet {
         fluidoOrigen1.setRangoDiametro(0.01f, 0.015f);
         fluidoOrigen1.setPosiciones(posiciones1);
         fluidoOrigen1.setNormales(normales1);
+        fluidoOrigen1.setDimensionesVentana(width, height);
         fluidoOrigen1.setRun(true);
 
         // cálculo para fluido origen 2
@@ -137,6 +138,7 @@ public class FluidoSimple extends PApplet {
         fluidoOrigen2.setRangoDiametro(0.01f, 0.015f);
         fluidoOrigen2.setPosiciones(posiciones2);
         fluidoOrigen2.setNormales(normales2);
+        fluidoOrigen2.setDimensionesVentana(width, height);
         fluidoOrigen2.setRun(true);
 
         // cálculo para fluido suma
@@ -164,6 +166,7 @@ public class FluidoSimple extends PApplet {
         fluidoSuma.setPosiciones(posicionesSuma);
         fluidoSuma.setNormales(normalesSuma);
         fluidoSuma.setRun(true);
+        fluidoSuma.setDimensionesVentana(width, height);
         fluidoSuma.agregarFluidoOrigen(fluidoOrigen1);
         fluidoSuma.agregarFluidoOrigen(fluidoOrigen2);
 
@@ -193,6 +196,7 @@ public class FluidoSimple extends PApplet {
         fluidoExtra.setNormales(normalesExtra);
         fluidoExtra.agregarFluidoOrigen(fluidoSuma);
         fluidoExtra.setRun(false);
+        fluidoExtra.setDimensionesVentana(width, height);
 
         lbl = new Label();
         lbl.setSketch(this);
