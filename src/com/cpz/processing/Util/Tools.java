@@ -125,8 +125,8 @@ public class Tools {
         }
     }
 
-    @NotNull
     public static List<PVector> calcularPosicionesEnRecta(PVector pIni, PVector pFin, int pasos) {
+        if (pIni == null || pFin == null) return null;
         List<PVector> lstPos = new ArrayList<>();
         for (int i = 0; i < pasos; i++) {
             PVector pos = PVector.lerp(pIni, pFin, (float) i / pasos);

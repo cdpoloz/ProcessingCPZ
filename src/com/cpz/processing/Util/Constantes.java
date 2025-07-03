@@ -51,6 +51,14 @@ public class Constantes {
     public static final int TECLA_MENOS = 140;
     public static final BigDecimal CIEN = new BigDecimal(100);
     public static final BigDecimal MIL = new BigDecimal(1000);
-    public static final int COLOR_TEST = Tools.construirColor(255, 0, 120, 255);
+    public static final int ROJO = Tools.construirColor(255, 0, 0, 255);
+    public static final int CYAN = Tools.construirColor(0, 255, 255, 255);
+    public static final int VERDE = Tools.construirColor(0, 255, 0, 255);
+    public static final int MAGENTA = Tools.construirColor(255, 0, 255, 255);
+    public static final int AZUL = Tools.construirColor(0, 0, 255, 255);
+    public static final int AMARILLO = Tools.construirColor(255, 255, 0, 255);
+    public static final int NEGRO = Tools.construirColor(0);
+    public static final int GRIS_MEDIO = Tools.construirColor(128);
+    public static final int BLANCO = Tools.construirColor(255);
     
 }
